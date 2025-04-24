@@ -7,3 +7,30 @@ Alberto Vavassori, Daniele Oxoli, Giovanna Venuti, Maria Antonia Brovelli, Mario
 
 
 
+
+## Sentinel-2 Data Exploration of LCZ Training Areas
+
+### Pixel Counts 
+
+![alt text](reports/figures/s2_pixel_counts.png)
+
+### Spectral Signature 
+
+![alt text](reports/figures/s2_spectral_signature.png)
+
+### Jeffries-Matuista Distance
+
+![alt text](reports/figures/s2_jm.png)
+
+
+
+## Training Random Forest to Classify LCZs on Sentinel-2 Imagery
+
+### Confusion Matrix
+
+![alt text](reports/figures/s2_cm.png)
+
+### Feature Importances
+
+![alt text](reports/figures/s2_fi.png)
+
