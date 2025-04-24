@@ -35,4 +35,4 @@ Alberto Vavassori, Daniele Oxoli, Giovanna Venuti, Maria Antonia Brovelli, Mario
 
 ![plot](reports/figures/s2_fi.png)
 
-img[alt=plot]{ width: 200px; }
+img[alt=plot]{ width: 50px; }
