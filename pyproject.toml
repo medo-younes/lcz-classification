@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "lcz_classification"
+version = "0.0.1"
+description = "ML-based classification of local climate zones (LCZ)"
+authors = [
+  { name = "Mohammad Younes" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+requires-python = "~=3.11.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["lcz_classification"]
+include = ["pyproject.toml", "lcz_classification/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["lcz_classification"]
+force-sort-within-sections = true
+
