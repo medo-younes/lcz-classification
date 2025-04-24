@@ -12,15 +12,15 @@ Alberto Vavassori, Daniele Oxoli, Giovanna Venuti, Maria Antonia Brovelli, Mario
 
 ### Pixel Counts 
 
-![alt text](reports/figures/s2_pixel_counts.png)
+![plot](reports/figures/s2_pixel_counts.png)
 
 ### Spectral Signature 
 
-![alt text](reports/figures/s2_spectral_signature.png)
+![plot](reports/figures/s2_spectral_signature.png)
 
 ### Jeffries-Matuista Distance
 
-![alt text](reports/figures/s2_jm.png)
+![plot](reports/figures/s2_jm.png)
 
 
 
@@ -28,9 +28,11 @@ Alberto Vavassori, Daniele Oxoli, Giovanna Venuti, Maria Antonia Brovelli, Mario
 
 ### Confusion Matrix
 
-![alt text](reports/figures/s2_cm.png)
+![plot](reports/figures/s2_cm.png)
+
 
 ### Feature Importances
 
-![alt text](reports/figures/s2_fi.png)
+![plot](reports/figures/s2_fi.png)
 
+img[alt=plot]{ width: 200px; }
