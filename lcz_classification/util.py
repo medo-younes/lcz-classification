@@ -8,10 +8,30 @@ import string
 import rasterio as r
 from rasterio.merge import merge
 from rasterio.enums import Resampling
-from lcz_classification.config import LCZ_CLASSES
 import pandas as pd
 import xarray as xr
 from rasterstats import zonal_stats
+import math
+from prettytable import PrettyTable
+from pyproj.crs import CRS as pycrs
+import fiona 
+fiona.supported_drivers['KML'] = 'r'  # Explicitly enable KML read support
+
+def kml_to_gdf(kml_path):
+    layers = fiona.listlayers(kml_path)
+    gdf_list = []
+
+    for layer in layers:
+        try:
+            with fiona.open(kml_path, driver='KML', layer=layer) as src:
+                gdf = gpd.GeoDataFrame.from_features(src, crs=src.crs)
+                gdf_list.append(gdf)
+        except:
+            print(f'Non-valid Layer: {layer}')
+
+    # Combine all into one GeoDataFrame
+    combined_gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True), crs=gdf_list[0].crs)
+    return combined_gdf
 
 
 def normalize_arr(arr, scaler):
@@ -21,7 +41,6 @@ def normalize_arr(arr, scaler):
 def read_lcz_legend(file_path):
     lcz_legend=pd.read_csv(file_path)
     lcz_legend["hex"]=lcz_legend.apply(lambda row: '#%02x%02x%02x' % (row.r,row.g,row.b) , axis=1)
-    lcz_legend["class_id"]=LCZ_CLASSES
     lcz_legend['rgb'] = lcz_legend.apply(lambda x: (x["r"],  x["g"], x["b"]), axis = 1)
     color_dict=lcz_legend[["name", "hex"]].set_index("name").hex.to_dict()
 
@@ -103,7 +122,51 @@ def merge_rasters(raster_paths, out_path):
     
 
 
+def get_target_shape(raster,target_res):
 
+    '''
+
+    Resample an xarray DataArray to a targett resolution
+    
+
+    Parameters
+    ----------
+    raster: xr.DataArray
+    Raster layer you would like to resample. CRS MUST BE IN METERS, WILL NOT WORK WITH EPSG:4326
+    
+    target_res : int
+    Cell resolution in METERS that you want to resample the raster to
+
+    Outputs
+    ---------
+
+    rescaled: xr.DataArray
+    Raster rescaled to the target resolution, keeping the original projection of the input raster
+    
+    '''
+    if target_res > 0.0099 and target_res <= 0.99:
+        print(f"Resampling input raster to {target_res * 100} cm resolution")
+    elif  target_res <= 0.0099:
+        print(f"Resampling input raster to {target_res * 1000} mm resolution")
+    else:
+        print(f"Resampling input raster to {target_res} m resolution")
+
+    orig_res=raster.rio.resolution() # Get original resolution of raster
+    orig_res_x = orig_res[0] # resolution in x / lon direction
+    orig_res_y = abs(orig_res[1]) # resolution in y / lat direction
+
+    orig_width = raster.rio.width # original width
+    orig_height = raster.rio.height # original height
+
+
+    rescale_x=target_res / orig_res_x # X rescale factor
+    rescale_y=target_res / orig_res_y # Y rescale factor
+
+    target_width= round(orig_width / rescale_x) # Calculate Target Width
+    target_height=round(orig_height / rescale_y) # Calculate Target Height
+
+
+    return (target_height, target_width)
 
 def resample_da(raster,target_res, resampling=Resampling.bilinear):
 
@@ -160,7 +223,7 @@ def resample_da(raster,target_res, resampling=Resampling.bilinear):
 
 
 
-def clip_raster(raster_path, bbox, out_path):
+def clip_raster(raster_path, gdf, bbox, out_path):
     
     '''
 
@@ -187,8 +250,16 @@ def clip_raster(raster_path, bbox, out_path):
     # Read Band Tile raster and clip with rasterio.mask
     with r.open(raster_path) as src:
         # clipped_path=SENT2_CLIPPED_DIR + "/" + band_tile_fp.replace(".tif","_clipped.tif").split("/")[-1] # Configure output path of clipped raster (per band)
+
+        if gdf is not None:
+
+            gdf=gdf.to_crs(src.crs)
+            bbox = list(gdf.geometry.values)
+
+        else:
+            bbox=[bbox]
         out_meta=src.meta.copy() # copy original metadata
-        out_image, out_transform = r.mask.mask(src, [bbox], crop=True, all_touched=True) # Clip raster
+        out_image, out_transform = r.mask.mask(src, bbox, crop=True, all_touched=True) # Clip raster
         print(f"Clipped {raster_path.split('/')[-1]}")
 
         #Update raster metadata with new dimensions and transform
@@ -273,18 +344,65 @@ def rasterize_vector(gdf, ref, attribute=None,out_path=None, crs=None, fill_valu
     
 
 
+
+import math
+
+
+def northing(y):
+    ns = "N" if y >= 0 else "S"
+    y = 5 * round(abs(int(y)) / 5)
+    return y, ns
+def easting(x):
+    ew = "E" if x >= 0 else "W"
+    x = 5 * round(abs(int(x)) / 5)
+    return x,ew
+
+
+def get_overlapping_tiles(bounds):
+
+    x1,y1,x2,y2 = bounds
+    e1,ew1=easting(x1)
+    e2,ew2=easting(x2)
+    n1,ns1=northing(y1)
+    n2,ns2=northing(y2)
+
+    tile_size=5
+   
+    if ew1 == "W":
+        e_list=[f"{x}{ew1}" for x in range(e2 - tile_size, e1 + tile_size, 5)]
+    elif ew1 == "E":
+        e_list=[f"{x}{ew1}" for x in range(e1 - tile_size, e2 + tile_size, 5)]
+
+    if ns1 == "N":
+        n_list = [f"{y}{ns1}" for y in range(n1 - tile_size, n2 + tile_size, 5)]
+    elif ns1 == "S":
+        n_list = [f"{y}{ns1}" for y in range(n2 - tile_size, n1 + tile_size, 5)]
+
+    ee,yy = np.meshgrid(e_list,n_list)
+    coords=np.vstack([yy.ravel(), ee.ravel()]).T
+
+    return ["_".join(ne) for ne in coords]
+
+
+
     
 def generate_raster(bbox,crs, resolution):
     x1,y1,x2,y2=bbox
 
+    crs = pycrs.from_epsg(crs)  # Replace with your CRS or .from_user_input(...)
+    # Check the unit
+    unit = crs.axis_info[0].unit_name
 
-    xx=np.arange(x1,x2, resolution)
-    yy=np.arange(y1,y2,resolution)
+    if unit == 'degree':
+        y_res, x_res = meter_to_deg(resolution, y1)
+    elif unit == 'metre' or unit == 'meter':
+        y_res, x_res = (resolution, resolution)
+
+    xx=np.arange(x1,x2, x_res)
+    yy=np.arange(y1,y2,y_res)
     xx_grid, yy_grid=np.meshgrid(xx,yy)
     # shape=
     fill=np.zeros_like(xx_grid)
-
-
     return xr.DataArray(
         data=fill,
         dims=["y","x"],
@@ -373,6 +491,111 @@ def band_stats(zones,raster,stats=['min', 'max', 'mean', 'median', 'majority']):
         
     
     return pd.concat(stats_df_list)
+
+
+def prepare_dataset(X, y, X_names=None):
+
+    ''' 
+    X: np.array
+        Stacked predictor features with shape (bands, width, height)
+
+    y: np.array
+        Target features (classes) with shape (1, width, height)
+
+    X_names: list
+        List of feature names of matching legnth of all X features
+
+    '''
+    # combine arrays and mask them with training areas
+    train_data=np.append(X,y, axis = 0)
+    mask = (y > 0).values[0] 
+    masked=np.array([arr[mask] for arr in train_data]) # Mask out null values 
+
+    # Prepare column names for train_df
+    cols=X_names.copy()
+    cols.append('y')
+
+    # Make DataFrame of for filtering out remaining nan values
+    df=pd.DataFrame(masked).T.dropna()
+    df.columns=cols
+    clean_df=df[~df.isna()]
+
+    # Reshape arrays for model fitting (width*height, bands)
+    X_df=clean_df[X_names].values.reshape(-1,X.shape[0])
+    y_df = clean_df['y'].values.reshape(-1)
+
+    return X_df, y_df
+
+
+def dataset_stats(X,y, label_dict):
+    stats=dict()
+
+    stats['samples']=X.shape[0]
+    stats['features']=X.shape[-1]
+    classes,class_counts = np.int16(np.unique(y, return_counts=True))
+    stats['n_classes']=len(classes)
+
+    if label_dict:
+        classes=[label_dict[x] for x in classes]
+    stats['class_counts'] =dict(zip(classes,class_counts))
+    
+    return stats
+
+
+def dataset_summary(train_stats,test_stats):
+    
+    table=PrettyTable()
+    table.field_names=["Datset","Samples", "Features", "Classes"]
+    table.add_rows([
+        ['Train',train_stats['samples'], train_stats['features'], train_stats['n_classes']],
+        ['Test', test_stats['samples'], test_stats['features'], test_stats['n_classes']]
+    ])
+
+    # print(f"Training Features: {X_train.shape[1]}")
+    # print(f"Training Samples: {X_train.shape[0]}")
+    # print(f"Validation Samples: {X_val.shape[0]}")
+    # print(f"Testing Samples: {X_test.shape[0]}")
+    print("============== DATASET SUMMARY ==============")
+    print(table)
+
+    class_table=PrettyTable()
+    class_table.field_names=["Class", "Train", "Test"]
+    table_vals=[list(x["class_counts"].values()) for x in [train_stats,test_stats]]
+    classes=[list(test_stats['class_counts'].keys())]
+    # table_vals= np.append(classes, table_vals)
+    classes.extend(table_vals)
+    table_vals=list(np.array(classes).T)
+    class_table.add_rows(table_vals)
+    print("")
+    print("============-==== CLASS SUMMARY =================")
+    print(class_table)
+
+
+
+def meter_to_deg(meters, latitude):
+    """
+    Convert distance in meters to approximate decimal degrees at a given latitude.
+    
+    Parameters:
+        meters (float): Cell size in meters.
+        latitude (float): Latitude in decimal degrees where the conversion is needed.
+        
+    Returns:
+        tuple: (degrees_lat, degrees_lon)
+    """
+    # Earth radius in meters (WGS84 approximation)
+    earth_radius = 6378137
+
+    # Degrees latitude per meter (fairly constant)
+    degrees_lat = meters / 111320  # ~111.32 km per degree
+
+    # Degrees longitude per meter (varies by latitude)
+    lat_rad = math.radians(latitude)
+    meters_per_deg_lon = (math.pi / 180) * earth_radius * math.cos(lat_rad)
+    degrees_lon = meters / meters_per_deg_lon
+
+    return degrees_lat, degrees_lon
+
 # def open_layer(layer_path):
 #   with rio.open(layer_path) as dataset:
 #     layer = dataset.read().squeeze()

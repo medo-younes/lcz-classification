@@ -1,9 +1,11 @@
 import processing 
+import os
 
+print(os.listdir())
 
 # SET DIRECTORY PATHS 
-dsm_dir='../processed/dsm'
-out_dir='../processed/svf'
+dsm_dir=r"D:\GeoAI\projects\LCZ_Classification\data\toronto\processed\svf"
+out_dir=r"D:\GeoAI\projects\LCZ_Classification\data\toronto\processed\svf"
 
 dsm_file='alos_dsm_30m.tif' # INPUT DSM FILE NAME
 
@@ -21,7 +23,7 @@ sectors=16
 
 # RUN SKY VIEW FACTOR SAGA SCRIPT
 processing.run("saga:skyviewfactor",{
-    'DEM': f'{dsm_dir}/{ds_file}',
+    'DEM': f'{dsm_dir}/{dsm_file}',
     'RADIUS' : radius,
     'METHOD' : method,
     'NDIRS' : sectors,

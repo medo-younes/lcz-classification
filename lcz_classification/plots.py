@@ -6,10 +6,15 @@ warnings.simplefilter('ignore')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from matplotlib.ticker import PercentFormatter
+import pandas as pd
+from sklearn.metrics import confusion_matrix
+import pandas as pd
 
+import matplotlib.cm as cm
+import matplotlib.colors as colors
 
-
-def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xlabel, stat='median'):
+def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xlabel, stat='median', out_file=None):
 
     """
     Plot spectral signature using a band statistics DataFrame 
@@ -29,7 +34,7 @@ def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xla
     --------
     Plot
     """
-    class_order = band_stats.drop_duplicates(class_col).sort_values('class_id')[class_col].to_list()
+    class_order = band_stats.drop_duplicates(class_col).sort_values(class_col)[class_col].to_list()
     fig, ax = plt.subplots(figsize=(8, 5))
 
     for name in class_order:
@@ -49,10 +54,14 @@ def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xla
 
     # Legend formatting
     plt.legend(bbox_to_anchor =(0.5,-0.4), loc='lower center', ncol = 4, frameon=False)
-    plt.show()
+
+    if out_file:
+        plt.savefig(out_file)
+
+    
 
 
-def pairwise_plot(df, class1,class2, dist_col, title):
+def pairwise_plot(df, class1,class2, dist_col, title, out_file=None):
     # Get Unique list of classes
     classes=df[class1].unique()
     n_classes=len(classes)
@@ -79,6 +88,9 @@ def pairwise_plot(df, class1,class2, dist_col, title):
     mask=np.array(mask)
     matrix=np.array(matrix)
 
+    if out_file:
+        plt.savefig(out_file)
+
 
     # Make pairwise distance plot
     plt.figure(figsize=(10, 8))
@@ -95,6 +107,134 @@ def pairwise_plot(df, class1,class2, dist_col, title):
                 )
 
     plt.title(title, fontweight='bold',fontdict=dict(size = 20))
+
+    if out_file:
+        plt.savefig(out_file)
+
+
+
+def plot_pixel_counts(pixel_count_df, count_col,class_col, color_col, title, out_file=None, as_percent=False, ):
+
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    pixel_count_df=pixel_count_df.sort_values(count_col,ascending=False) 
+    y=pixel_count_df[count_col]  
+    classes=pixel_count_df[class_col]
+    colors=pixel_count_df[color_col]
+    if as_percent:
+        y = y / y.sum() * 100
+        ylabel = 'Percentage of Pixels'
+        plt.gca().yaxis.set_major_formatter(PercentFormatter(decimals=0)) 
+    else:
+        
+        ylabel = "Number of Pixels"
+
+    
+
+    ax.bar(x=classes,height=y, color=colors, linewidth=1, edgecolor='black')
+
+    plt.xticks(rotation=90)
+    plt.ylabel(ylabel, fontdict=dict(size=15))
+    plt.title(title, fontdict=dict(size=15,weight='bold'))
+
+    # Hide specific spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    if out_file:
+        plt.savefig(out_file)
+
+
+
+def map_training_areas(train,test,boundary=None):
+    
+
+    m = train.explore(
+                    color='blue', 
+                    legend=True, 
+                    tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    attr='Esri World Imagery'
+                    )
+
+
+    test.explore(
+        fill=True,
+        color='red',
+        m=m
+    )
+
+    boundary.explore(style={
+                    "fill": False,
+                    "color": "red"
+                    },
+                    m=m
+    )
+    return m
+
+def plot_confusion_matrix(y_test,y_pred, title,labels, cmap='Blues', as_percent=False, out_file=None):
+
+    cm=confusion_matrix(y_test,y_pred)
+    mask = cm == 0.0
+
+    plt.figure(figsize=(5,5))
+    fmt=".0f"
+
+    if as_percent:
+        cm=(cm / len(y_test))
+        fmt=".1%"
+    
+    sns.heatmap(cm, 
+                annot=True, 
+                fmt=fmt, 
+                cmap=cmap,
+                cbar=False,
+                xticklabels=labels, 
+                yticklabels=labels, 
+                mask=mask,
+                linewidths=2, 
+                linecolor='black', 
+             
+                )
+    plt.xlabel("True",  fontdict=dict(size = 15, weight ='bold'))
+    plt.ylabel("Predicted",  fontdict=dict(size = 15, weight ='bold'))
+    plt.title(title, fontdict=dict(size = 12, weight ='bold'), loc='center', pad=20, x= 0.4)
+    plt.legend([],[], frameon=False)
+
+    if out_file:
+        plt.savefig(out_file)
+
+    plt.show()
+
+
+
+
+
+def plot_feature_importances(rf,features, title, out_file):
+
+    rf_i = pd.Series(rf.feature_importances_, index=features).sort_values()
+
+    # Choose a colormap (e.g., 'viridis', 'plasma', 'coolwarm', etc.)
+    cmap = cm.get_cmap('RdYlGn')
+
+    # Normalize the series to the range 0-1
+    norm = colors.Normalize(vmin=rf_i.min(), vmax=rf_i.max())
+
+    # Map each value to a color
+    rgba_colors = [cmap(norm(val)) for val in rf_i]
+    hex_colors = [colors.to_hex(c) for c in rgba_colors]
+
+    fig, ax = plt.subplots()
+    rf_i.plot.barh(ax=ax, color=hex_colors)
+    ax.set_title(title)
+    ax.set_xlabel("Mean decrease in impurity")
+    fig.tight_layout()
+
+    if out_file:
+        plt.savefig(out_file)
+
+    plt.show()
+
 
 # def plot_training_samples(training, cmm, legend):
 
