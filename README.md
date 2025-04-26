@@ -2,7 +2,7 @@
 
 **Work in Progress 
 
-<img src="reports/figures/lcz_s2_map.png" alt="drawing" width="500"/>
+<img src="reports/figures/lcz_s2_map.png" alt="drawing" width="800"/>
 
 
 ### 1. Local Climate Zones
@@ -35,7 +35,7 @@ A Random Forest Classifier on Sentinel-2 imagery and GIS-derived Urban Canopy Pa
 
 #### Confusion Matrix
 
-<img src="reports/figures/s2_cm.png" alt="drawing" width="700"/>
+<img src="reports/figures/s2_cm.png" alt="drawing" width="500"/>
 
 #### Feature Importances
 <img src="reports/figures/s2_fi.png" alt="drawing" width="500"/>
