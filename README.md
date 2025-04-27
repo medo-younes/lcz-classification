@@ -7,6 +7,7 @@ The Urban Heat Island (UHI) effect is a phenomenon whereby air temperatures in u
 
 <img src="references/lcz_typology_demuzere2020.png" alt="drawing" width="500"/>
 
+Credits: Demuzere et al. (2020)
 ### 2. A Toronto Case Study
 
 This project explores the application of LCZs for understanding the UHI in the city of Toronto, Ontario. A study in 2021 found that Toronto experienced an annual average daytime UHI intensity of 4.3 C (Duan et al. 2024).
