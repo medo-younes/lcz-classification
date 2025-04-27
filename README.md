@@ -2,24 +2,8 @@
 
 ### 1. Local Climate Zones
 
-The Urban Heat Island (UHI) effect is a phenomenon whereby air temperatures in urban environments are significantly heightened when compared to rural areas. Such an effect is largely due to the thermal properties of urban structures, which tend to absorb heat during the day and release it during the night. Traditional studies typically measured UHI using dichotomous urban / rural classification when comparing temperature trends. Such an approach fails to capture the diverse nature of urban areas, whereby building height, compactness and vegetation cover can vary substantially over space. Developed Stewart and Oke (2012), the Local Climate Zone (LCZ) classification scheme aims to characterise The scheme comprises 17 zones based mainly on properties of surface structure (e.g., building and tree height & density) and surface cover (pervious vs. impervious). Each zone is local in scale, meaning it represents horizontal distances of 100s of metres to several kilometres.  The scheme is a logical starting point for WUDAPT’s aim to gather consistent information across cities globally. 
+The Urban Heat Island (UHI) effect is a phenomenon whereby air temperatures in urban environments are significantly heightened when compared to rural areas. Such an effect is largely due to the thermal properties of urban structures, which tend to absorb heat during the day and release it during the night. Traditional studies typically measured UHI using dichotomous urban / rural classification when comparing temperature trends. Such an approach fails to capture the diverse nature of urban areas, whereby building height, compactness and vegetation cover can vary substantially over space. Developed Stewart and Oke (2012), the Local Climate Zone (LCZ) classification scheme aims to characterise The scheme comprises 17 zones based mainly on properties of surface structure (e.g., building and tree height & density) and surface cover (pervious vs. impervious). Each zone is local in scale, meaning it represents horizontal distances of 100s of metres to several kilometres.  The scheme is a logical starting point for WUDAPT’s aim to gather consistent information across cities globally. To learn more about the Local Climate Zone framework, you can refer to the [WUDAPT Webpage](https://www.wudapt.org/lcz/). A useful resource to better undetstand LCZ can be found in this [illustration by Demuzere et al (2020)](https://www.wudapt.org/wp-content/uploads/2021/03/LCZ_Typology_Demuzere2020.pdf).
 
-| Built Types | Land Cover Types |   |
-| Number | Name                  | Surface Cover Description                | Number | Name               | Surface Cover Description            |
-|--------|------------------------|------------------------------------------|--------|--------------------|--------------------------------------|
-| 1      | Compact High-Rise      | Dense high-rise buildings                | A      | Dense Trees        | Dense tree cover                    |
-| 2      | Compact Mid-Rise       | Dense mid-rise buildings                 | B      | Scattered Trees    | Scattered tree cover                |
-| 3      | Compact Low-Rise       | Dense low-rise buildings                 | C      | Bush, Scrub        | Bush and scrub vegetation           |
-| 4      | Open High-Rise         | Open arrangement of high-rise buildings  | D      | Low Plants         | Grass or herbaceous vegetation      |
-| 5      | Open Mid-Rise          | Open arrangement of mid-rise buildings   | E      | Bare Rock or Paved | Bare rock or paved surfaces         |
-| 6      | Open Low-Rise          | Open arrangement of low-rise buildings   | F      | Bare Soil or Sand  | Bare soil or sand surfaces          |
-| 7      | Lightweight Low-Rise   | Lightweight low-rise buildings           | G      | Water              | Water bodies                        |
-| 8      | Large Low-Rise         | Large footprint low-rise buildings       |        |                    |                                      |
-| 9      | Sparsely Built         | Sparse arrangement of buildings          |        |                    |                                      |
-| 10     | Heavy Industry         | Heavy industrial buildings               |        |                    |                                      |
-
-
-Credits: Demuzere et al. (2020)
 ### 2. A Toronto Case Study
 
 This project explores the application of LCZs for understanding the UHI in the city of Toronto, Ontario. A study in 2021 found that Toronto experienced an annual average daytime UHI intensity of 4.3 C (Duan et al. 2024).
