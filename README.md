@@ -1,4 +1,4 @@
-# Automated classification of Local Climate Zones (LCZs) using Random Forest trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters for inter-urban urban heat island analysis in Toronto, Ontario, Canada.
+# Automated classification of Local Climate Zones (LCZs) using Random Forest trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters for intra-urban urban heat island analysis in Toronto, Ontario, Canada.
 
 ### 1. Local Climate Zones
 
