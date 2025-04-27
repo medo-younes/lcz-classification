@@ -56,7 +56,7 @@ S2_TARGET_BANDS=["B02", "B03", "B04", "B05", "B06", "B07", "B8A", "B11", "B12"] 
 
 ## WORFLOW PARAMETERS
 CELL_RESOLUTION = 30 # desired resolution in meters
-
+TILE_DIMS = (1,2)
 
 ## DIRECTORY PATHS ##
 # ===============================================================================================================================================================
@@ -106,7 +106,7 @@ BH_VECTOR_FP = f"{BH_PRC}/building_height.parquet"
 BH_RASTER_FP=f"{BH_PRC}/building_height_5m.tif"
 
 # LOCAL CLIMATE ZONE TRAINNG AREAS
-LCZ_FP=f'{LCZ_RAW}/data/7976099d71531998af88ba33d9ccf91b74abeca9.kml'
+LCZ_FP=f'{LCZ_RAW}/training_areas_updated.geojson'
 # LCZ_FP=f"{TRAIN_PRC}/lcz_{CITY.lower()}.geojson"
 
 

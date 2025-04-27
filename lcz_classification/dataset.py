@@ -249,8 +249,6 @@ def ee_download(asset_id, bands, date_range, bbox, output_dir, tile_dims=None, s
 
 
 
-
-
 def get_city_polygon(city,country):
     # Get city boundary polygon
     gdf = ox.geocode_to_gdf(f"{city}, {country}")

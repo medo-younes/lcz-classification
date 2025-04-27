@@ -61,7 +61,7 @@ def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xla
     
 
 
-def pairwise_plot(df, class1,class2, dist_col, title, out_file=None):
+def pairwise_plot(df, class1,class2, dist_col, title, figsize, cbar=True,out_file=None):
     # Get Unique list of classes
     classes=df[class1].unique()
     n_classes=len(classes)
@@ -93,7 +93,7 @@ def pairwise_plot(df, class1,class2, dist_col, title, out_file=None):
 
 
     # Make pairwise distance plot
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=figsize)
     plot_mask = (mask == True) | (matrix == 0.0)
     sns.heatmap(matrix, 
                 annot=True, 
@@ -103,13 +103,15 @@ def pairwise_plot(df, class1,class2, dist_col, title, out_file=None):
                 yticklabels=classes, 
                 linewidths=1, 
                 linecolor='white', 
-                mask=plot_mask
+                mask=plot_mask, 
+                cbar=cbar
+                
                 )
 
-    plt.title(title, fontweight='bold',fontdict=dict(size = 20))
+    plt.title(title, fontweight='bold',fontdict=dict(size = 15), loc='left', x=0.0)
 
     if out_file:
-        plt.savefig(out_file)
+        plt.savefig(out_file,bbox_inches='tight', dpi=300, pad_inches=0.2)
 
 
 
@@ -172,17 +174,17 @@ def map_training_areas(train,test,boundary=None):
     )
     return m
 
-def plot_confusion_matrix(y_test,y_pred, title,labels, cmap='Blues', as_percent=False, out_file=None):
+def plot_confusion_matrix(y_test,y_pred, title,labels, figsize,cmap='Blues', as_percent=False, out_file=None):
 
     cm=confusion_matrix(y_test,y_pred)
     mask = cm == 0.0
 
-    plt.figure(figsize=(5,5))
+    plt.figure(figsize=figsize)
     fmt=".0f"
 
     if as_percent:
-        cm=(cm / len(y_test))
-        fmt=".1%"
+        cm=(cm / len(y_test)) * 100
+        fmt=".1f"
     
     sns.heatmap(cm, 
                 annot=True, 
@@ -192,17 +194,17 @@ def plot_confusion_matrix(y_test,y_pred, title,labels, cmap='Blues', as_percent=
                 xticklabels=labels, 
                 yticklabels=labels, 
                 mask=mask,
-                linewidths=2, 
-                linecolor='black', 
+                linewidths=1,
+                linecolor='white'
              
                 )
     plt.xlabel("True",  fontdict=dict(size = 15, weight ='bold'))
     plt.ylabel("Predicted",  fontdict=dict(size = 15, weight ='bold'))
-    plt.title(title, fontdict=dict(size = 12, weight ='bold'), loc='center', pad=20, x= 0.4)
+    plt.title(title, fontdict=dict(size = 12, weight ='bold'), loc='center', pad=0.8, x= 0.4)
     plt.legend([],[], frameon=False)
 
     if out_file:
-        plt.savefig(out_file)
+        plt.savefig(out_file, dpi=300, pad_inches=0.2,)
 
     plt.show()
 

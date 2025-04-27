@@ -101,19 +101,26 @@ def tiles_from_bbox(bbox, crs=4236, tile_dims=(4,4)):
     numbers.reverse()
 
     tiles["tile_id"]=[f"{l}{n}"  for l in letters for n in numbers]
-    return tiles
+    return tiles.sort_values('tile_id')
 
 
-def merge_rasters(raster_paths, out_path):
+def merge_rasters(raster_paths, out_path, transform):
     rasters= [r.open(path) for path in raster_paths]
-    array, transform = merge(rasters)
 
+    
+    array, merge_transform = merge(rasters)
+
+    if transform is not None:
+        out_transform = transform
+    else: 
+        out_transform = merge_transform
     # Use metadata from one of the source files and update it
+    
     out_meta = rasters[0].meta.copy()
     out_meta.update({
         "height": array.shape[1],
         "width": array.shape[2],
-        "transform": transform
+        "transform": out_transform
     })
 
     # Write the merged output
@@ -223,7 +230,7 @@ def resample_da(raster,target_res, resampling=Resampling.bilinear):
 
 
 
-def clip_raster(raster_path, gdf, bbox, out_path):
+def clip_raster(raster_path, gdf,crs, bbox, out_path, nodata):
     
     '''
 
@@ -246,27 +253,31 @@ def clip_raster(raster_path, gdf, bbox, out_path):
 
     If out_path is not provided, returns the clipped raster
     '''
-
+  
     # Read Band Tile raster and clip with rasterio.mask
     with r.open(raster_path) as src:
         # clipped_path=SENT2_CLIPPED_DIR + "/" + band_tile_fp.replace(".tif","_clipped.tif").split("/")[-1] # Configure output path of clipped raster (per band)
 
         if gdf is not None:
 
-            gdf=gdf.to_crs(src.crs)
+            gdf=gdf.to_crs(crs)
             bbox = list(gdf.geometry.values)
 
         else:
             bbox=[bbox]
         out_meta=src.meta.copy() # copy original metadata
-        out_image, out_transform = r.mask.mask(src, bbox, crop=True, all_touched=True) # Clip raster
+        out_image, out_transform = r.mask.mask(src, bbox, crop=True, nodata=nodata, all_touched=False) # Clip raster
+
+
         print(f"Clipped {raster_path.split('/')[-1]}")
 
         #Update raster metadata with new dimensions and transform
         out_meta.update({"driver": "GTiff",
                         "height": out_image.shape[1],
                         "width": out_image.shape[2],
-                        "transform": out_transform})
+                        "transform": out_transform,
+                        'nodata' : nodata
+                        })
     
     # Write clipped raster as GeoTIFF
     with r.open(out_path, "w", **out_meta) as dest:
@@ -532,7 +543,7 @@ def dataset_stats(X,y, label_dict):
 
     stats['samples']=X.shape[0]
     stats['features']=X.shape[-1]
-    classes,class_counts = np.int16(np.unique(y, return_counts=True))
+    classes,class_counts = np.int64(np.unique(y, return_counts=True))
     stats['n_classes']=len(classes)
 
     if label_dict:
