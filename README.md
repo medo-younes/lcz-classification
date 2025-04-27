@@ -4,8 +4,7 @@
 
 The Urban Heat Island (UHI) effect is a phenomenon whereby air temperatures in urban environments are significantly heightened when compared to rural areas. Such an effect is largely due to the thermal properties of urban structures, which tend to absorb heat during the day and release it during the night. Traditional studies typically measured UHI using dichotomous urban / rural classification when comparing temperature trends. Such an approach fails to capture the diverse nature of urban areas, whereby building height, compactness and vegetation cover can vary substantially over space. Developed Stewart and Oke (2012), the Local Climate Zone (LCZ) classification scheme aims to characterise The scheme comprises 17 zones based mainly on properties of surface structure (e.g., building and tree height & density) and surface cover (pervious vs. impervious). Each zone is local in scale, meaning it represents horizontal distances of 100s of metres to several kilometres.  The scheme is a logical starting point for WUDAPT’s aim to gather consistent information across cities globally. 
 
-| Built Types |  |  | Land Cover Types |  |  |
-|-------------|--|--|------------------|--|--|
+| Built Types | Land Cover Types |   |
 | Number | Name                  | Surface Cover Description                | Number | Name               | Surface Cover Description            |
 |--------|------------------------|------------------------------------------|--------|--------------------|--------------------------------------|
 | 1      | Compact High-Rise      | Dense high-rise buildings                | A      | Dense Trees        | Dense tree cover                    |
