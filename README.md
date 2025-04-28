@@ -19,7 +19,7 @@ Primary Objectives:
 
 #### Sentinel-2 L2A Imagery
 
-As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were utilized from the harmonized Sentinel-2A dataset. Below is an RGB composite of the Sentinel-2 imagery collected on 15th of May, 2023.
+As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were utilized from the harmonized Sentinel-2 L2A dataset. Below is an RGB composite of the Sentinel-2 imagery collected on 15th of May, 2023.
 
 <img src="reports/figures/S2.png" alt="drawing" width="500"/>
 
