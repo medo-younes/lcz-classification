@@ -29,7 +29,7 @@ As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were ut
 <img src="reports/figures/S2.png" alt="drawing" width="500"/>
 
 
-Spectral Signature of LCZ Classes 
+#### Spectral Signature of LCZ Classes 
 
 <img src="reports/figures/s2_spectral_signature.png" alt="drawing" width="500"/>
 
@@ -39,11 +39,9 @@ Spectral Seperability Between Classes using Jeffries-Matuista Distance
 <img src="reports/figures/s2_jm.png" alt="drawing" width="500"/>
 
 
-#### 3.2. Urban Canopy Parameters
+#### Urban Canopy Parameters
 
 <img src="reports/figures/UCPs.png" alt="drawing" width="500"/>
-
-
 
 ### 3. LCZ Classification with Random Forest
 
