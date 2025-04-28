@@ -1,6 +1,8 @@
 # Urban Heat Island Analysis on Toronto using Automated Local Climate Zone Classification
 Automated classification of Local Climate Zones (LCZs) using Random Forest trained on Sentinel-2 L2A imagery and GIS-derived Urban Canopy Parameters for intra-urban urban heat island analysis in Toronto, Ontario, Canada.
 
+<img src="reports/figures/lcz_s2_map.png" alt="drawing" width="500"/>
+
 ### 1. Local Climate Zones
 
 The Urban Heat Island (UHI) effect is a phenomenon whereby air temperatures in urban environments are significantly heightened when compared to rural areas. Such an effect is largely due to the thermal properties of urban structures, which tend to absorb heat during the day and release it during the night. Traditional studies typically measured UHI using dichotomous urban / rural classification when comparing temperature trends. Such an approach fails to capture the diverse nature of urban areas, whereby building height, compactness and vegetation cover can vary substantially over space. Developed Stewart and Oke (2012), the Local Climate Zone (LCZ) classification scheme aims to characterise The scheme comprises 17 zones based mainly on properties of surface structure (e.g., building and tree height & density) and surface cover (pervious vs. impervious). Each zone is local in scale, meaning it represents horizontal distances of 100s of metres to several kilometres.  The scheme is a logical starting point for WUDAPT’s aim to gather consistent information across cities globally. To learn more about the Local Climate Zone framework, you can refer to the [WUDAPT Webpage](https://www.wudapt.org/lcz/). A useful resource to better undetstand LCZ can be found in this [illustration by Demuzere et al (2020)](https://www.wudapt.org/wp-content/uploads/2021/03/LCZ_Typology_Demuzere2020.pdf).
@@ -44,8 +46,6 @@ Spectral Seperability Between Classes using Jeffries-Matuista Distance
 
 A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes, data processing, data exploration and model assessment follows the methodology from Vavasorri et al. (2024). The trained model attained an overall testing accuracy of 82%, the classification report, confusion matrix and feature importances are given below.
 
-
-
 ### Accuracy Metrics
 
 |                    | precision | recall | f1-score | support |
@@ -77,9 +77,12 @@ A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urb
 #### Feature Importances
 <img src="reports/figures/s2_fi.png" alt="drawing" width="500"/>
 
-### 4. LCZ Mapping with Trained Random Forest Model
+### 4. Next Steps 
 
-<img src="reports/figures/lcz_s2_map.png" alt="drawing" width="800"/>
+- Benchmarking against LCZ Generator
+- Urban Heat Island Analysis
+
+
 
 ### References
 
