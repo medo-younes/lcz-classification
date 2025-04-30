@@ -1,18 +1,17 @@
 ,precision,recall,f1-score,support
-Compact High-Rise,0.85,0.8,0.82,397
-Compact Mid-Rise,0.73,0.48,0.58,415
-Compact Low-Rise,0.69,0.72,0.71,1145
-Open High-Rise,0.51,0.37,0.43,426
-Open Mid-Rise,0.58,0.31,0.4,538
-Open Low-Rise,0.65,0.71,0.68,1225
-Large low-rise,0.78,0.88,0.83,1068
-Sparsely built,0.73,0.84,0.78,1259
-Dense trees,0.9,0.95,0.93,579
-Scattered trees,0.91,0.89,0.9,401
-Low plants,0.97,0.97,0.97,2417
-Bare rock or paved,0.8,0.93,0.86,313
-Bare soil or sand,0.95,0.89,0.92,419
+Compact High-Rise,0.91,0.78,0.84,397
+Compact Mid-Rise,0.77,0.43,0.55,144
+Open High-Rise,0.64,0.5,0.56,317
+Open Mid-Rise,0.68,0.21,0.32,143
+Open Low-Rise,0.88,0.94,0.91,2742
+Large low-rise,0.86,0.94,0.9,1444
+Sparsely built,0.76,0.69,0.72,871
+Dense trees,0.93,0.98,0.96,593
+Scattered trees,0.94,0.91,0.92,401
+Low plants,0.97,0.97,0.97,2424
+Bare rock or paved,0.83,0.92,0.87,349
+Bare soil or sand,0.95,0.91,0.93,552
 Water,1.0,1.0,1.0,1570
-accuracy,0.82,0.82,0.82,0
-macro avg,0.79,0.77,0.77,12172
-weighted avg,0.82,0.82,0.82,12172
+accuracy,0.9,0.9,0.9,0
+macro avg,0.85,0.78,0.8,11947
+weighted avg,0.9,0.9,0.9,11947
