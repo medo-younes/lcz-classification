@@ -45,30 +45,33 @@ Spectral Seperability Between Classes using Jeffries-Matuista Distance
 
 ### 3. LCZ Classification with Random Forest
 
-A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes, data processing, data exploration and model assessment follows the methodology from Vavasorri et al. (2024). The trained model attained an overall testing accuracy of 82%, the classification report, confusion matrix and feature importances are given below.
+A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes, data processing, data exploration and model assessment follows the methodology from Vavasorri et al. (2024). The trained model attained an overall testing accuracy of 90%, the classification report, confusion matrix and feature importances are given below.
 
 ### Accuracy Metrics
 
-|                    | precision | recall | f1-score | support |
-| ------------------ | --------- | ------ | -------- | ------- |
-| Compact High-Rise  | 0.85      | 0.79   | 0.82     | 397     |
-| Compact Mid-Rise   | 0.73      | 0.49   | 0.59     | 415     |
-| Compact Low-Rise   | 0.69      | 0.72   | 0.7      | 1145    |
-| Open High-Rise     | 0.51      | 0.37   | 0.43     | 426     |
-| Open Mid-Rise      | 0.59      | 0.31   | 0.41     | 538     |
-| Open Low-Rise      | 0.65      | 0.71   | 0.68     | 1225    |
-| Large low-rise     | 0.78      | 0.88   | 0.83     | 1068    |
-| Sparsely built     | 0.73      | 0.84   | 0.78     | 1259    |
-| Dense trees        | 0.9       | 0.95   | 0.93     | 579     |
-| Scattered trees    | 0.9       | 0.89   | 0.9      | 401     |
-| Low plants         | 0.97      | 0.96   | 0.97     | 2417    |
-| Bare rock or paved | 0.8       | 0.93   | 0.86     | 313     |
-| Bare soil or sand  | 0.95      | 0.89   | 0.92     | 419     |
-| Water              | 1.0       | 1.0    | 1.0      | 1570    |
-| accuracy           | 0.82      | 0.82   | 0.82     | 0       |
-| macro avg          | 0.79      | 0.77   | 0.77     | 12172   |
-| weighted avg       | 0.82      | 0.82   | 0.82     | 12172   |
-|                    |
+|Metric      |Result|
+|------------|------|
+|accuracy    |0.90  |
+|macro avg   |0.85  |
+|weighted avg|0.90  |
+
+### Classification Report
+
+|Class         |Precision|Recall|F1-score|Support|
+|------------------|---------|------|--------|-------|
+|Compact High-Rise |0.91     |0.78  |0.84    |397    |
+|Compact Mid-Rise  |0.77     |0.43  |0.55    |144    |
+|Open High-Rise    |0.64     |0.5   |0.56    |317    |
+|Open Mid-Rise     |0.68     |0.21  |0.32    |143    |
+|Open Low-Rise     |0.88     |0.94  |0.91    |2742   |
+|Large low-rise    |0.86     |0.94  |0.9     |1444   |
+|Sparsely built    |0.76     |0.69  |0.72    |871    |
+|Dense trees       |0.93     |0.98  |0.96    |593    |
+|Scattered trees   |0.94     |0.91  |0.92    |401    |
+|Low plants        |0.97     |0.97  |0.97    |2424   |
+|Bare rock or paved|0.83     |0.92  |0.87    |349    |
+|Bare soil or sand |0.95     |0.91  |0.93    |552    |
+|Water             |1.0      |1.0   |1.0     |1570   |
 
 
 #### Confusion Matrix
