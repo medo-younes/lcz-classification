@@ -200,11 +200,11 @@ def plot_confusion_matrix(y_test,y_pred, title,labels, figsize,cmap='Blues', as_
                 )
     plt.xlabel("True",  fontdict=dict(size = 15, weight ='bold'))
     plt.ylabel("Predicted",  fontdict=dict(size = 15, weight ='bold'))
-    plt.title(title, fontdict=dict(size = 12, weight ='bold'), loc='center', pad=0.8, x= 0.4)
+    plt.title(title, fontdict=dict(size = 12, weight ='bold'), loc='center', pad=20, x= 0.4)
     plt.legend([],[], frameon=False)
 
     if out_file:
-        plt.savefig(out_file, dpi=300, pad_inches=0.2,)
+        plt.savefig(out_file, dpi=300, bbox_inches='tight', )
 
     plt.show()
 
