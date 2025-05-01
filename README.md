@@ -22,6 +22,17 @@ Primary Objectives:
 
 ### 3. Datasets
 
+The table below outlines the various datasets employed for conducting LCZ classification in Toronto. Except for the Canadian buildings dataset, all datasets are available on a global scale and thus can be utilized for any city, as long as the appropriate building heights data is acquired. 
+
+|Name      |Spatial Resolution| Reference Date|Source | 
+|------------|------------|------------|------------|
+|Sentinel-L2A   | 10 / 20 m  | 2023 | [Google Earth Engine Catalog](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED#description)|
+|ALOS DSM: Global (30m) v3.2  | 30 m  | 2006 | [Google Earth Engine Catalog](https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_AW3D30_V3_2)|
+|Automatically Extracted Buildings  | NA (Vector) | 2023| [Government of Canada](https://open.canada.ca/data/en/dataset/7a5cda52-c7df-427f-9ced-26f19a8a64d6)|
+|ETH Global Sentinel-2 (10m) Canopy Height  | 30 m  |2020 | [Google Earth Engine Catalog](https://gee-community-catalog.org/projects/canopy/)|
+|GISA-10m Impervious Surface Area | 10 m  |2016 | [Huang et al (2021)](https://zenodo.org/records/5791855)|
+
+
 #### Sentinel-2 L2A Imagery
 
 As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were utilized from the harmonized Sentinel-2 L2A dataset. Below is an RGB composite of the Sentinel-2 imagery collected on 15th of May, 2023.
@@ -41,6 +52,17 @@ Spectral Seperability Between Classes using Jeffries-Matuista Distance
 
 #### Urban Canopy Parameters
 
+Following the steps outlined by Vavassori et al. (2024), Urban Canopy Parameters for Toronto were derived.
+
+|UCP      | Source Dataset| 
+|------------|------------|
+|Building Height  | [Government of Canada](https://open.canada.ca/data/en/dataset/7a5cda52-c7df-427f-9ced-26f19a8a64d6) | 
+|Tree Canopy Height| [ETH Global Sentinel-2 (10m) Canopy Height](https://gee-community-catalog.org/projects/canopy/) | 
+|Sky View Factor  |[ALOS DSM: Global (30m) v3.2 ](https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_AW3D30_V3_2) |
+|Impervious Surface Fraction | [GISA-10m Impervious Surface Area](https://zenodo.org/records/5791855)|
+|Building Surface Fraction| [Government of Canada](https://open.canada.ca/data/en/dataset/7a5cda52-c7df-427f-9ced-26f19a8a64d6)|
+
+
 <img src="reports/figures/UCPs.png" alt="drawing" width="500"/>
 
 ### 3. LCZ Classification with Random Forest
@@ -51,27 +73,27 @@ A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urb
 
 |Metric      |Result|
 |------------|------|
-|accuracy    |0.90  |
-|macro avg   |0.85  |
-|weighted avg|0.90  |
+|Accuracy    |0.87  |
+|Macro Avg   |0.83  |
+|Weighted Avg |0.87  |
 
 ### Classification Report
 
 |Class         |Precision|Recall|F1-score|Support|
 |------------------|---------|------|--------|-------|
-|Compact High-Rise |0.91     |0.78  |0.84    |397    |
-|Compact Mid-Rise  |0.77     |0.43  |0.55    |144    |
-|Open High-Rise    |0.64     |0.5   |0.56    |317    |
-|Open Mid-Rise     |0.68     |0.21  |0.32    |143    |
-|Open Low-Rise     |0.88     |0.94  |0.91    |2742   |
-|Large low-rise    |0.86     |0.94  |0.9     |1444   |
-|Sparsely built    |0.76     |0.69  |0.72    |871    |
-|Dense trees       |0.93     |0.98  |0.96    |593    |
-|Scattered trees   |0.94     |0.91  |0.92    |401    |
-|Low plants        |0.97     |0.97  |0.97    |2424   |
-|Bare rock or paved|0.83     |0.92  |0.87    |349    |
-|Bare soil or sand |0.95     |0.91  |0.93    |552    |
+|Compact High-Rise |0.86     |0.8   |0.83    |664    |
+|Open High-Rise    |0.67     |0.7   |0.69    |1166   |
+|Open Mid-Rise     |0.73     |0.44  |0.55    |471    |
+|Open Low-Rise     |0.87     |0.91  |0.89    |2741   |
+|Large low-rise    |0.86     |0.89  |0.87    |1596   |
+|Sparsely built    |0.72     |0.65  |0.68    |871    |
+|Dense trees       |0.9      |0.96  |0.93    |593    |
+|Scattered trees   |0.88     |0.92  |0.90     |451    |
+|Low plants        |0.96     |0.96  |0.96    |2424   |
+|Bare rock or paved|0.72     |0.91  |0.80     |380    |
+|Bare soil or sand |0.95     |0.91  |0.93    |553    |
 |Water             |1.0      |1.0   |1.0     |1570   |
+
 
 
 #### Confusion Matrix
