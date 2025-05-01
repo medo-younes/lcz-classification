@@ -33,12 +33,15 @@ The table below outlines the various datasets employed for conducting LCZ classi
 |GISA-10m Impervious Surface Area | 10 m  |2016 | [Huang et al (2021)](https://zenodo.org/records/5791855)|
 
 
+#### Local Climate Zone Training Areas
+
+A total of 317 training area polygons representing 12 LCZ classes were employed. The polygons were widely distributed around Toronto, enabling effective training of the Random Forest classifier.
+
+<img src="reports/figures/lcz_training_areas.png" alt="drawing" width="500"/>
+
 #### Sentinel-2 L2A Imagery
 
 As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were utilized from the harmonized Sentinel-2 L2A dataset. Below is an RGB composite of the Sentinel-2 imagery collected on 15th of May, 2023.
-
-<img src="reports/figures/S2.png" alt="drawing" width="500"/>
-
 
 #### Spectral Signature of LCZ Classes 
 
