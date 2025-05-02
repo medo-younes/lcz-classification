@@ -3,7 +3,11 @@ import os
 
 print(os.listdir())
 
-# SET DIRECTORY PATHS 
+# Sky View Factor Python Script for SAGA GIS in QGIS Python Console
+## Open this script in QGIS >=3.28 , make sure SAGA GIS functions are available via the Processing Toolbox
+
+
+# SET DIRECTORY PATHS - use absolute path
 dsm_dir=r"D:\GeoAI\projects\LCZ_Classification\data\toronto\processed\svf"
 out_dir=r"D:\GeoAI\projects\LCZ_Classification\data\toronto\processed\svf"
 

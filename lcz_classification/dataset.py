@@ -1,25 +1,32 @@
-import osmnx as ox
-import boto3
-from botocore import UNSIGNED
-from botocore.client import Config
+
+from lcz_classification.config import STUDY_AREA_FP, CRS, S2_METADATA_FP, S2_TILES_FP, LCZ_LEGEND_FP
+
+
 import geopandas as gpd
-import arrow
-import json
 import os
 from lcz_classification.util import tiles_from_bbox
 import ee
 import geemap
 import osmnx as ox
 import pandas as pd
-from lcz_classification.config import STUDY_AREA_FP, CRS, S2_METADATA_FP, S2_TILES_FP, LCZ_LEGEND_FP
 import numpy as np
-from shapely.geometry import box
-# AWS S3 DATA DOWNLOAD
-s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
 
 
 def fetch_metadata(name):
+    """Retrieve metadata dataset using filepaths configured in config.py
+    
+    Args:
+        name (str): Name of metadata to fetch 1 of 4 options: 
+                    (1) STUDY_AREA
+                    (2) S2_TILES
+                    (3) S2_METADATA
+                    (4) LCZ_LEGEND
+    
+    Returns:
+        DataFrame: Desired metadata in a DataFrame or GeoDataFrame object
+
+    """
 
     d=dict(
         STUDY_AREA = dict(fp=STUDY_AREA_FP, tp = 'gdf'),
@@ -42,89 +49,20 @@ def fetch_metadata(name):
         
 
 
-
-def get_matching_s3_keys(bucket, prefix='', suffix=''):
-    kwargs = {'Bucket': bucket, 'Prefix': prefix}
-    while True:
-        resp = s3.list_objects_v2(**kwargs)
-        for obj in resp['Contents']:
-            key = obj['Key']
-            if key.endswith(suffix):
-                yield key
-
-        try:
-            kwargs['ContinuationToken'] = resp['NextContinuationToken']
-        except KeyError:
-            break
-
-
-
-def get_matching_scenes(bucket, tiles, date_range, prefix):
-    matching_scenes = []
-
-    for tile in tiles:
-        keys = list(get_matching_s3_keys(bucket, prefix=f'{prefix}/{tile[0:2]}/{tile[2]}/{tile[3:5]}/'))
-        for key in keys:
-            scene_id = key.split('/')[-2]
-            scene_date = arrow.get(scene_id.split('_')[2], 'YYYYMMDD')
-            if scene_id not in matching_scenes and scene_date >= date_range[0] and scene_date <= date_range[1]:
-                matching_scenes.append(scene_id)
-
-    
-    print(f'Found {len(matching_scenes)} matching scenes')
-    print(matching_scenes)
-    return matching_scenes
-
-
-def download_tiles(scenes, bands, prefix, out_dir):
-    
-    for scene in scenes:
-        scene_dir=f'{out_dir}/{scene}'
-        print(f"- Sentinel-2 -- Downloading Bands {', '.join(bands)} from Scene {scene}")
-        tile = scene.split('_')[1]
-        date = scene.split('_')[2]
-        year = date[0:4]
-        month = date[4:6]
-        
-        if not os.path.exists(scene_dir):
-            os.makedirs(scene_dir)
-        
-            files=[f"{b}.tif" for b in bands]
-      
-            for f in files:
-                key = f'{prefix}/{tile[0:2]}/{tile[2]}/{tile[3:5]}/{year}/{int(month)}/{scene}/{f}'
-            
-                fname = key.split('/')[-1]
-                print(f'{scene_dir}/{fname}')
-                s3.download_file('sentinel-cogs', key, f'{scene_dir}/{fname}')
-
-        else:
-            print(f"{scene_dir} already exists")
-
-
-
-
-
-
 def ee_download(asset_id, bands, date_range, bbox, output_dir, tile_dims=None, scale=30):
-    """
-    Download ALOS DSM data for a specified bounding box using Google Earth Engine.
-    
-    Parameters:
-    -----------
-    bbox : list
-        Bounding box coordinates in format [west, south, east, north]
-    output_dir : str
-        Directory to save the downloaded data
-    filename : str
-        Output filename for the GeoTIFF
-    scale : int
-        Resolution in meters for the exported image (default is 30m to match ALOS)
-    
+    """Download ALOS DSM data for a specified bounding box using Google Earth Engine.
+
+    Args: 
+        asset_id (str): Asset ID of dataset on Google Earth Engine Catalog
+        bands (list): Desired bands to select and download from the requested dataset
+        date_range (list): start and end date to filter the ee.ImageCollection
+        bbox (list): Bounding box coordinates in format [west, south, east, north]
+        output_dir (str): Output directory to save downloaded GeoTIFFs
+        tile_dims (tuple): Dimensions of tiling for subdividing the bbox into smaller regions, useful for downloading from large areas
+        scale (int): Desired spatial resolution in meters
+        
     Returns:
-    --------
-    str
-        Path to the downloaded GeoTIFF file
+        str: Path to the downloaded GeoTIFF file
     """
     # Initialize Earth Engine
     try:
@@ -249,7 +187,18 @@ def ee_download(asset_id, bands, date_range, bbox, output_dir, tile_dims=None, s
 
 
 
-def get_city_polygon(city,country):
+def get_city_polygon(city:str,country:str) -> gpd.GeoDataFrame:
+    """
+    Using osmnx OpenStreetMap library, get polygon of city boundaries as a GeoDataFrame.
+    
+    Args:
+        city (str): The city you want a polygon of
+        country (str): The country of your city
+    
+    Returns:
+        GeoDataFrame: Polygon geometry of city boundary.
+
+    """
     # Get city boundary polygon
     gdf = ox.geocode_to_gdf(f"{city}, {country}")
     gdf.to_crs(gdf.estimate_utm_crs(), inplace=True)

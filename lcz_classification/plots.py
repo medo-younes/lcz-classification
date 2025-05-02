@@ -15,25 +15,22 @@ import matplotlib.cm as cm
 import matplotlib.colors as colors
 
 def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xlabel, stat='median', out_file=None):
-
-    """
-    Plot spectral signature using a band statistics DataFrame 
+    """Plot spectral signature using a band statistics DataFrame 
     
-    Parameters:
-    -----------
-
-    band_stats
-    x_col
-    class_col
-    color_dict
-    title
-    xlabel
-    stat='median'
-
+    Args:
+        band_stats (DataFrame): Pandas DataFrame of band statistics, retrieved from rasterstats.zonal_stats function
+        x_col (str): Column for x-axis
+        class_col (str): Column including class names
+        color_dict (dict): Mapping between class name and color
+        title (str): Plot title
+        xlabel (str): Text label for x-axis
+        stat (str): Name of statistic to plot, median is default, other options include mean, std, min and max
+        out_file (str): Output file path of saved figure, only saves figure if not None
+ 
     Returns:
-    --------
-    Plot
+        matplotlib.figure.Figure: Plot of spectral signature of all classess in the band_stats DataFrame
     """
+
     class_order = band_stats.drop_duplicates(class_col).sort_values(class_col)[class_col].to_list()
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -61,7 +58,22 @@ def plot_spectral_signature(band_stats, x_col, class_col, color_dict, title, xla
     
 
 
-def pairwise_plot(df, class1,class2, dist_col, title, figsize, cbar=True,out_file=None):
+def plot_pairwise_jm(df, class1,class2, dist_col, title, figsize, cbar=True,out_file=None):
+    """Pairwise Jeffries-Matuista Distance Plot 
+    
+    Args:
+        df (DataFrame): Jeffries-Matuista Distance between each class combination
+        class1 (str): Column name of first classess
+        class2 (str): Column name of second classes
+        dist_col (str): Colum name including Jeffries-Matuista Distance values
+        title (str): Plot title
+        figsize (tuple): Desired figure Size
+        cbar (boolean): Show color bar if True
+        out_file (str): Output file path of saved figure, only saves figure if not None
+ 
+    Returns:
+        matplotlib.figure.Figure: Plot of Jeffries-Matuista Distances between all classes
+    """
     # Get Unique list of classes
     classes=df[class1].unique()
     n_classes=len(classes)
@@ -115,7 +127,21 @@ def pairwise_plot(df, class1,class2, dist_col, title, figsize, cbar=True,out_fil
 
 
 
-def plot_pixel_counts(pixel_count_df, count_col,class_col, color_col, title, out_file=None, as_percent=False, ):
+def plot_pixel_counts(pixel_count_df, count_col,class_col, color_col, title, as_percent=False, out_file=None):
+    """Bar plot of pixel counts for each class
+    
+    Args:
+        df (DataFrame): Pixel counts of each class in a Pandas DataFrame
+        count_col (str): Name of column including pixel counts
+        class_col (str): Name of column including class names
+        color_col (str): Name of column including color values
+        title (str): Plot title
+        as_percent (boolean): Display values as percentage of total pixels if True
+        out_file (str): Output file path of saved figure, only saves figure if not None
+ 
+    Returns:
+        matplotlib.figure.Figure: Bar plot of pixel counts for each class
+    """
 
 
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -148,42 +174,31 @@ def plot_pixel_counts(pixel_count_df, count_col,class_col, color_col, title, out
         plt.savefig(out_file)
 
 
-
-def map_training_areas(train,test,boundary=None):
+def plot_confusion_matrix(y_true,y_pred, title,labels, figsize,cmap='Blues', as_percent=False, out_file=None):
+    """Confusion matrix heat map using Seaborn 
     
+    Args:
+        y_true (list): True labels
+        y_pred (list): Predicted labels 
+        title (str): Plot title
+        labels (list): Label names mapped to numeric label values
+        figsize (tuple): Desired figure dimensions
+        cmap (str): Desired color palette
+        as_percent (boolean): Display values as percentage of total pixels if True
+        out_file (str): Output file path of saved figure, only saves figure if not None
+ 
+    Returns:
+        matplotlib.figure.Figure: Confusion matrix heat map using Seaborn 
+    """
 
-    m = train.explore(
-                    color='blue', 
-                    legend=True, 
-                    tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                    attr='Esri World Imagery'
-                    )
-
-
-    test.explore(
-        fill=True,
-        color='red',
-        m=m
-    )
-
-    boundary.explore(style={
-                    "fill": False,
-                    "color": "red"
-                    },
-                    m=m
-    )
-    return m
-
-def plot_confusion_matrix(y_test,y_pred, title,labels, figsize,cmap='Blues', as_percent=False, out_file=None):
-
-    cm=confusion_matrix(y_test,y_pred)
+    cm=confusion_matrix(y_true,y_pred)
     mask = cm == 0.0
 
     plt.figure(figsize=figsize)
     fmt=".0f"
 
     if as_percent:
-        cm=(cm / len(y_test)) * 100
+        cm=(cm / len(y_true)) * 100
         fmt=".1f"
     
     sns.heatmap(cm, 
@@ -213,6 +228,17 @@ def plot_confusion_matrix(y_test,y_pred, title,labels, figsize,cmap='Blues', as_
 
 
 def plot_feature_importances(rf,features, title, out_file):
+    """Plot Feature Importances of a Random Forest Classifier as a horizontal bar plot
+    
+    Args:
+        rf (RandomForestClassifer): Trained RandomForestClassifer from sklearn
+        features (list): Name of predictors use in the Random Forest Model
+        title (str): Plot title
+        out_file (str): Output file path of saved figure, only saves figure if not None
+ 
+    Returns:
+        matplotlib.figure.Figure: Feature Importances of a Random Forest Classifier as a horizontal bar plot
+    """
 
     rf_i = pd.Series(rf.feature_importances_, index=features).sort_values()
 
@@ -236,134 +262,3 @@ def plot_feature_importances(rf,features, title, out_file):
         plt.savefig(out_file)
 
     plt.show()
-
-
-# def plot_training_samples(training, cmm, legend):
-
-#     cmm_gdf = gpd.read_file(cmm)
-#     training = gpd.read_file(training)
-
-#     training['LCZ'] = training['LCZ'].astype(int)
-#     training = training.sort_values('LCZ')
-
-#     # add a column with the correspondence between LCZ class and its name
-#     training['LCZ_name'] = training['LCZ'].map(legend).str[0]
-
-#     lcz_list = [value[0] for value in legend.values()]
-
-#     cmap_colors = [value[1] for value in legend.values()]
-
-#     print(f'List of LCZ: {lcz_list}')
-#     print(f'List of colors: {cmap_colors}')
-
-#     m = cmm_gdf.explore(
-#         style_kwds = {'fillOpacity': 0},
-#         marker_kwds=dict(radius=10, fill=True),
-#         tooltip_kwds=dict(labels=False),
-#         tooltip = False,
-#         popup = False,
-#         highlight = False,
-#         name="cmm"
-#     )
-
-#     training.explore(m=m,
-#         column="LCZ_name",
-#         tooltip="LCZ_name",
-#         popup=True,
-#         tiles="CartoDB positron",
-#         style_kwds=dict(color="black"),
-#         categories=lcz_list,
-#         cmap=cmap_colors
-#     )
-
-#     # create a dictionary (shapes) containing the geometries of the training samples
-#     # the dictionary keys are the LCZ classes
-#     shapes = {}
-#     LCZ_class = training['LCZ'].unique()
-#     for LCZ in LCZ_class:
-#         shapes[LCZ] = training.loc[training['LCZ'] == LCZ].geometry
-
-#     return training, m, shapes
-
-
-# def plot_ucl(imperv, perc_build, svf, canopy_height, buildings):
-
-#     # Display the classification layers
-#     fig, axs = plt.subplots(2, 3, figsize=(14, 8))
-
-#     im1 = axs[0, 0].imshow(svf)
-#     axs[0, 0].set_title('Sky View Factor [0-1]')
-#     cbar1 = fig.colorbar(im1, ax=axs[0, 0], shrink=0.8)
-
-#     im2 = axs[0, 1].imshow(imperv)
-#     axs[0, 1].set_title('Impervious Surface Fraction [0-1]')
-#     cbar2 = fig.colorbar(im2, ax=axs[0, 1], shrink=0.8)
-
-#     im3 = axs[0, 2].imshow(perc_build)
-#     axs[0, 2].set_title('Building Surface Fraction [0-1]')
-#     cbar3 = fig.colorbar(im3, ax=axs[0, 2], shrink=0.8)
-
-#     im4 = axs[1, 0].imshow(canopy_height)
-#     axs[1, 0].set_title('Tree Canopy Height [0-1]')
-#     cbar4 = fig.colorbar(im4, ax=axs[1, 0], shrink=0.8)
-
-#     im5 = axs[1, 1].imshow(buildings, vmax=0.2)
-#     axs[1, 1].set_title('Buildings [0-1]')
-#     cbar5 = fig.colorbar(im5, ax=axs[1, 1], shrink=0.8)
-
-#     # Remove the axis for the blank subplot
-#     axs[1, 2].axis('off')
-
-#     # Remove x and y ticks from every subplot
-#     for ax in axs.flat:
-#         ax.set_xticks([])
-#         ax.set_yticks([])
-#         ax.set_title(ax.get_title(), fontsize=10)
-
-#     # Adjust the spacing between subplots
-#     plt.tight_layout()
-
-
-#     plt.show()
-
-
-# def plot_dynamic_map(map, legend):
-#     # Create the plot
-#     fig, ax = plt.subplots(figsize=(10, 8))
-
-#     # Extract class keys and corresponding colors in order
-#     class_keys = sorted(legend.keys())
-#     class_colors = [legend[key][1] for key in class_keys]
-#     cmap = ListedColormap(class_colors, name='LCZ classes colormap')
-
-#     # Create a mapping from class values to the colormap indices
-#     class_to_cmap_index = {class_key: idx for idx, class_key in enumerate(class_keys)}
-#     mapped_array = np.vectorize(class_to_cmap_index.get)(map)
-
-#     # Plot the map array using the colormap
-#     im = ax.imshow(mapped_array, cmap=cmap)
-
-#     # Generate the legend only for the classes present in the data
-#     unique_classes = np.unique(map)
-#     legend_labels = []
-#     legend_colors = []
-
-#     for class_val in unique_classes:
-#         if class_val in legend:
-#             legend_labels.append(legend[class_val][0])
-#             legend_colors.append(legend[class_val][1])
-
-#     # Create patches for the legend
-#     patches = [mpatches.Patch(color=color, label=label)
-#                for label, color in zip(legend_labels, legend_colors)]
-#     ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-
-#     # Add the title
-#     ax.set_title("Classified map")
-
-#     # Remove axes for cleaner visualization
-#     ax.axis('off')
-
-#     # Display the plot
-#     plt.tight_layout()
-#     plt.show()

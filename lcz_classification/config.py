@@ -43,8 +43,6 @@ CRS=4326
 CITY = "Toronto" # Select City Name
 COUNTRY = "Canada" # Select Country Name
 
-# INSERT Google Earth Engine Project Name
-EE_PROJECT_NAME='ee-geoai-medo'
 
 # Setup Date Range
 TARGET_DATE = '2021-07-15'
@@ -106,7 +104,7 @@ BH_VECTOR_FP = f"{BH_PRC}/building_height.parquet"
 BH_RASTER_FP=f"{BH_PRC}/building_height_5m.tif"
 
 # LOCAL CLIMATE ZONE TRAINNG AREAS
-LCZ_FP=f'{LCZ_RAW}/training_areas_updated.geojson'
+LCZ_FP=f'{LCZ_RAW}/training_areas_v2.geojson'
 # LCZ_FP=f"{TRAIN_PRC}/lcz_{CITY.lower()}.geojson"
 
 

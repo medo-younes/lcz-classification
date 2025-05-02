@@ -15,9 +15,22 @@ import math
 from prettytable import PrettyTable
 from pyproj.crs import CRS as pycrs
 import fiona 
+
+import math
+
+
 fiona.supported_drivers['KML'] = 'r'  # Explicitly enable KML read support
 
 def kml_to_gdf(kml_path):
+    """Read KML file a GeoPandas GeoDataFrame
+    
+    Args:
+        kml_path (str): Path to KML file
+
+
+    Returns:
+        GeoDataFrame: Geometry features of KML file read into GeoPandas GeoDataFrame
+    """
     layers = fiona.listlayers(kml_path)
     gdf_list = []
 
@@ -35,6 +48,15 @@ def kml_to_gdf(kml_path):
 
 
 def normalize_arr(arr, scaler):
+    """Rescale values of an array using a given scaler such as MinMaxScaler
+    
+    Args:
+        arr (np.array): Numpy array
+        scaler (sklearn.preprocessing.MinMaxScaler): scaler object from sklearn.preprocessing
+
+    Returns:
+        np.array: Rescaled numpy array
+    """
     return scaler.fit_transform(arr.reshape(-1,1)).reshape(arr.shape)
 
 
@@ -46,22 +68,16 @@ def read_lcz_legend(file_path):
 
     return lcz_legend, color_dict
 
+
 def tiles_from_bbox(bbox, crs=4236, tile_dims=(4,4)):
-    """
-    Generates polygon tiles of 
+    """Generates polygon tiles subdividing a given bounding box based on the given dimensions
     
-    Parameters:
-    -----------
-    bbox : list
-        Bounding box coordinates in format [x1,y1,x2,y2]
-    tile_dims : tuple
-        How many tiles to sub-section the bounding box with the dimensions (width, length)
-        With tile_dims == (4,4) the function will return 16 (4 x 4) tile polygons
+    Args:
+        bbox (list): Bounding box coordinates in format [x1,y1,x2,y2]
+        tile_dims (tuple): How many tiles to sub-section the bounding box with the dimensions (width, length). With tile_dims == (4,4) the function will return 16 (4 x 4) tile polygons
 
     Returns:
-    --------
-    GeoDataFrame
-        Geopandas GeoDataFrame of generated tiles as Shapely Polygons
+        GeoDataFrame: GeoPandas GeoDataFrame of generated tiles as Shapely Polygons
     """
 
     x1,y1,x2,y2=bbox # Get left, top, right, bottom from bounding box
@@ -105,6 +121,17 @@ def tiles_from_bbox(bbox, crs=4236, tile_dims=(4,4)):
 
 
 def merge_rasters(raster_paths, out_path, transform):
+    """Merge multiple rasters into one
+    
+    Args:
+        raster_paths (list): Paths of rasters to merge
+        out_path (list): File path of merged raster
+        transform (rasterio.Affine): Affine transform of output raster, retrieved from a reference raster
+
+
+    Returns:
+        None
+    """
     rasters= [r.open(path) for path in raster_paths]
 
     
@@ -130,25 +157,14 @@ def merge_rasters(raster_paths, out_path, transform):
 
 
 def get_target_shape(raster,target_res):
-
-    '''
-
-    Resample an xarray DataArray to a targett resolution
+    '''Resample an xarray DataArray to a targett resolution
     
+    Args
+        raster (xr.DataArray): Raster layer you would like to resample. CRS MUST BE IN METERS, WILL NOT WORK WITH EPSG:4326
+        target_res (int): Cell resolution in METERS that you want to resample the raster to
 
-    Parameters
-    ----------
-    raster: xr.DataArray
-    Raster layer you would like to resample. CRS MUST BE IN METERS, WILL NOT WORK WITH EPSG:4326
-    
-    target_res : int
-    Cell resolution in METERS that you want to resample the raster to
-
-    Outputs
-    ---------
-
-    rescaled: xr.DataArray
-    Raster rescaled to the target resolution, keeping the original projection of the input raster
+    Returns
+        tuple: Desired shape of raster when resampling to target resolution
     
     '''
     if target_res > 0.0099 and target_res <= 0.99:
@@ -176,27 +192,17 @@ def get_target_shape(raster,target_res):
     return (target_height, target_width)
 
 def resample_da(raster,target_res, resampling=Resampling.bilinear):
-
-    '''
-
-    Resample an xarray DataArray to a targett resolution
+    '''Resample an xarray DataArray to a targett resolution
     
+    Args
+        raster (xr.DataArray): Raster layer you would like to resample. CRS MUST BE IN METERS, WILL NOT WORK WITH EPSG:4326
+        target_res (int): Cell resolution in METERS that you want to resample the raster to
 
-    Parameters
-    ----------
-    raster: xr.DataArray
-    Raster layer you would like to resample. CRS MUST BE IN METERS, WILL NOT WORK WITH EPSG:4326
-    
-    target_res : int
-    Cell resolution in METERS that you want to resample the raster to
-
-    Outputs
-    ---------
-
-    rescaled: xr.DataArray
-    Raster rescaled to the target resolution, keeping the original projection of the input raster
+    Returns
+        rescaled (xr.DataArray): Raster rescaled to the target resolution, keeping the original projection of the input raster
     
     '''
+
     if target_res > 0.0099 and target_res <= 0.99:
         print(f"Resampling input raster to {target_res * 100} cm resolution")
     elif  target_res <= 0.0099:
@@ -231,27 +237,17 @@ def resample_da(raster,target_res, resampling=Resampling.bilinear):
 
 
 def clip_raster(raster_path, gdf,crs, bbox, out_path, nodata):
-    
-    '''
+    ''' Clip raster from inputted file path to a bounding box
 
-    Clip raster from inputted file path to a bounding box
-    
+    Args:
+        raster_path (str): File path of raster to clip
+        gdf (GeoDataFrame): Polygon to clip raster
+        bbox (shapely.geometry.Polygon): Polygon of bounding box for clipping raster
+        out_path (str): File path of clipped raster
+        nodata (int or float): Fill value or No Data value
 
-    Parameters
-    ----------
-    raster_path: str
-        File path of raster to clip
-    
-    bbox : Polygon
-        Shapely Polygon of bounding box for clipping raster
-
-    out_path: str
-        Ouptut file path of clipped raster
-
-    Outputs
-    ---------
-
-    If out_path is not provided, returns the clipped raster
+    Returns:
+        None
     '''
   
     # Read Band Tile raster and clip with rasterio.mask
@@ -289,18 +285,16 @@ def clip_raster(raster_path, gdf,crs, bbox, out_path, nodata):
 def rasterize_vector(gdf, ref, attribute=None,out_path=None, crs=None, fill_value=0):
     '''
 
-        gdf : GeoDataFrame
-            Vector polygon GeoDataFrame to rasterize
+    Args:
+        gdf (GeoDataFrame): Vector polygon GeoDataFrame to rasterize
+        src (DataArray): Reference raster to match crs, dimensions and transform
+        attribute (str): Column from gdf to burn into output raster, must be an integer type
+        out_path (str): Output file path for the raster
+        crs: Target coordinate reference system
+        fill_value (int): Fill or No Data Value
         
-        src : DataArray
-            Reference raster to match crs, dimensions and transform
-
-        attribute : str
-            Column from gdf to burn into output raster, must be an integer type
-
-        out_path : str
-            Output file path for the raster
-        
+    Returns:
+        None
     '''
     # Load vector data using geopandas
 
@@ -356,22 +350,49 @@ def rasterize_vector(gdf, ref, attribute=None,out_path=None, crs=None, fill_valu
 
 
 
-import math
 
 
 def northing(y):
+    ''' Get northing based on latitude
+
+    Args:
+        y (float): Latitude coordinate in WGS84 / EPSG:4326 projection
+       
+
+    Returns:
+        str: Northing value
+    '''
     ns = "N" if y >= 0 else "S"
     y = 5 * round(abs(int(y)) / 5)
     return y, ns
+
 def easting(x):
+    ''' Get easting based on longitude
+
+    Args:
+        x (float): longitude coordinate in WGS84 / EPSG:4326 projection
+       
+
+    Returns:
+        str: Easting Value
+    '''
     ew = "E" if x >= 0 else "W"
     x = 5 * round(abs(int(x)) / 5)
     return x,ew
 
 
-def get_overlapping_tiles(bounds):
+def get_overlapping_tiles(bbox):
+    '''Get overlapping tile names baased on input bounding box
 
-    x1,y1,x2,y2 = bounds
+    Args:
+        bbox (list): bounding box list ordered x1, y1, x2, y2
+       
+
+    Returns:
+        list: Names of all tiles that overlap the given bounding box
+    '''
+
+    x1,y1,x2,y2 = bbox
     e1,ew1=easting(x1)
     e2,ew2=easting(x2)
     n1,ns1=northing(y1)
@@ -398,6 +419,18 @@ def get_overlapping_tiles(bounds):
 
     
 def generate_raster(bbox,crs, resolution):
+    '''Generate at empty raster at the desired resolution within the input bounding box
+
+    Args:
+        bbox (list): bounding box list ordered x1, y1, x2, y2
+        crs: coordinate reference system fo generated raster EPSG number or pyproj.CRS object
+        bbox (int): Desired resolution of generated raster in meters
+       
+
+    Returns:
+        xr.DataArray: Empty raster at the desired resolution within the input bounding box
+    '''
+
     x1,y1,x2,y2=bbox
 
     crs = pycrs.from_epsg(crs)  # Replace with your CRS or .from_user_input(...)
@@ -475,16 +508,19 @@ def jeffries_matuista_distance(class1, class2):
 
 
 def band_stats(zones,raster,stats=['min', 'max', 'mean', 'median', 'majority']):
-    """
-    Compute band statsitics from a Geopandas GeoDataFrame and an xarray DataArray
-    
-    Parameters:
-    - class1: np.ndarray of shape (n_samples, n_bands)
-    - class2: np.ndarray of shape (n_samples, n_bands)
-    
+    '''Compute band statsitics from a Geopandas GeoDataFrame and an xarray DataArray
+
+
+    Args:
+        zones (np.array): Classified zones for raster statistics
+        raster (xr.Datarray): Stack of features for extracting statistics
+        stats (list): Desired statistics
+       
+
     Returns:
-    - JM distance (float)
-    """
+        DataFrame: Statistics of each class from each band
+    '''
+  
     affine=raster.rio.transform()
     stats_df_list=list()
     for band in raster.band:
@@ -539,6 +575,18 @@ def prepare_dataset(X, y, X_names=None):
 
 
 def dataset_stats(X,y, label_dict):
+    '''Get statistics of machine learning dataset
+
+    Args:
+        X (np.array): 2D Array shaped (total_pixels, n_features)
+        y (np.array): 1D Array shaped (total_pixels)
+        label_dict (dict): mapping between y values to label names
+       
+
+    Returns:
+        dict: Dataset statistics in a dictionary object
+    '''
+    
     stats=dict()
 
     stats['samples']=X.shape[0]
@@ -554,6 +602,13 @@ def dataset_stats(X,y, label_dict):
 
 
 def dataset_summary(train_stats,test_stats):
+    '''Print Dataset Summary
+
+    Args:
+        train_stats (dict): Statistics of training dataset, outputted from dataset_stats()
+        test_stats (dict): Statistics of testing dataset, outputted from dataset_stats()
+      
+    '''
     
     table=PrettyTable()
     table.field_names=["Datset","Samples", "Features", "Classes"]
@@ -562,10 +617,7 @@ def dataset_summary(train_stats,test_stats):
         ['Test', test_stats['samples'], test_stats['features'], test_stats['n_classes']]
     ])
 
-    # print(f"Training Features: {X_train.shape[1]}")
-    # print(f"Training Samples: {X_train.shape[0]}")
-    # print(f"Validation Samples: {X_val.shape[0]}")
-    # print(f"Testing Samples: {X_test.shape[0]}")
+   
     print("============== DATASET SUMMARY ==============")
     print(table)
 
@@ -587,7 +639,7 @@ def meter_to_deg(meters, latitude):
     """
     Convert distance in meters to approximate decimal degrees at a given latitude.
     
-    Parameters:
+    Args:
         meters (float): Cell size in meters.
         latitude (float): Latitude in decimal degrees where the conversion is needed.
         
@@ -606,179 +658,5 @@ def meter_to_deg(meters, latitude):
     degrees_lon = meters / meters_per_deg_lon
 
     return degrees_lat, degrees_lon
-
-# def open_layer(layer_path):
-#   with rio.open(layer_path) as dataset:
-#     layer = dataset.read().squeeze()
-
-#     layer[layer < 0] = 0
-#     #layer = np.nan_to_num(layer, nan=0)
-#     min_val = np.min(layer)
-#     max_val = np.max(layer)
-
-#     if max_val > 1:
-#       normalized_array = (layer - min_val) / (max_val - min_val)
-#       print(f"{layer_path} shape: {layer.shape} ---> Max value: {np.max(normalized_array):.2f} | Min value: {np.min(normalized_array):.2f}")
-#       return normalized_array
-#     else:
-#       print(f"{layer_path} shape: {layer.shape} ---> Max value: {np.max(layer):.2f} | Min value: {np.min(layer):.2f}")
-#       return layer
-
-# def check_layers_dimension(imperv, perc_build, svf, canopy_height, buildings, roi, img):
-
-#     # Check dimensions and compute new layers if necessary
-#     array_dim = 3 # if they already have dimension 3 don't expand dimensions
-
-#     if imperv.ndim < array_dim:
-#         imperv = np.expand_dims(imperv, axis=-1)
-#     if perc_build.ndim < array_dim:
-#         perc_build = np.expand_dims(perc_build, axis=-1)
-#     if svf.ndim < array_dim:
-#         svf = np.expand_dims(svf, axis=-1)
-#     if canopy_height.ndim < array_dim:
-#         canopy_height = np.expand_dims(canopy_height, axis=-1)
-#     if buildings.ndim < array_dim:
-#         buildings = np.expand_dims(buildings, axis=-1)
-
-
-#     print("Impervious shape: ", imperv.shape)
-#     print("Build percentage shape: ", perc_build.shape)
-#     print("SVF shape: ", svf.shape)
-#     print("Tree Canopy Height shape: ", canopy_height.shape)
-#     print("Building shape: ", buildings.shape)
-#     print("ROI shape: ", roi.shape)
-#     print("Landsat image: ", img.shape)
-
-
-#     # Calculate the difference in width between the current shape and the target shape
-#     width_diff = np.abs(imperv.shape[0] - roi.shape[0])
-#     height_diff = np.abs(imperv.shape[1] - roi.shape[1])
-#     print(roi.shape)
-#     print(width_diff, height_diff)
-
-#     # Pad the array with zeros along the width
-#     roi = np.pad(roi, ((0, 0), (0, width_diff)), mode='constant')
-#     roi = np.pad(roi, ((0, 0), (0, height_diff)), mode='constant')
-#     print(f"The ROI shape is --> {roi.shape}")
-
-#     return imperv, perc_build, svf, canopy_height, buildings, roi
-
-
-
-
-# def export_classified_map(img, clc, X, selected_image):
-
-#     img = np.nan_to_num(img)
-
-#     # reshape into long 2d array (nrow * ncol, nband) for classification
-#     new_shape = (img.shape[0] * img.shape[1], img.shape[2])
-
-#     img_as_array = img[:, :, :X.shape[1]].reshape(new_shape)
-#     print('Reshaped from {o} to {n}'.format(o=img.shape, n=img_as_array.shape))
-
-#     # Now predict for each pixel
-#     class_prediction = clc.predict(img_as_array)
-
-#     # Reshape our classification map
-#     class_prediction = class_prediction.reshape(img[:, :, 0].shape)
-
-#     # Save the images in GeoTIFF format
-#     prisma_image = rio.open(selected_image)
-#     kwargs = prisma_image.meta
-#     kwargs.update(
-#         dtype=rio.float32,
-#         nodata = np.nan,
-#         count=1)
-
-#     folder_path = "classified_images"
-
-#     # Check if the folder doesn't exist
-#     if not os.path.exists(folder_path):
-#         # Create the folder
-#         os.makedirs(folder_path)
-#         print("Folder created successfully.")
-#     else:
-#         print("Folder already exists.")
-
-#     # Application of the median filter
-#     print(f"Application of a median filter of size 3...")
-#     # define the size of the median filter window
-#     filter_size = 3
-#     # apply the median filter to the classified image
-#     smoothed_image = median_filter(class_prediction, size=(filter_size, filter_size))
-
-#     # save the classified image with rasterio
-#     with rio.open(output_file_path, 'w', **kwargs) as dst:
-#         dst.write(smoothed_image, 1)
-#         print(f"The smoothed classified file {output_file_path} has been created!")
-
-#     from google.colab import files
-#     files.download(output_file_path)
-
-#     return class_prediction, smoothed_image
-
-
-# def print_accuracy(classified_image, testing, legend):
-
-#     with rio.open(classified_image) as src:
-#         mappa = src.read()
-#         modified_mappa = mappa.copy()
-#         modified_mappa[modified_mappa == 0] = np.nan
-#         unique_values_mappa = np.unique(modified_mappa)
-
-#     with rio.open(testing) as src:
-#         test = src.read()
-#         modified_test = test.astype('float')
-#         modified_test[modified_test == 0] = np.nan
-#         unique_values_test = np.unique(modified_test)
-
-#     # Retrieve the indices where testing_samples is greater than 0
-#     x, y, z = np.where(modified_test>0)
-
-#     # Select the testing samples that are greater than 0
-#     test_samples = modified_test[modified_test > 0]
-#     # Extract the corresponding classified samples from classified_image using the indices
-#     classified_samples = modified_mappa[x, y, z]
-
-#     # Retrieve the indices where classified_samples are greater than 0 and not NaN
-#     a = np.where((classified_samples > 0) & (~np.isnan(classified_samples)))
-
-#     # Filter the test_samples and classified_samples based on the indices obtained
-#     test_samples = test_samples[a]
-#     classified_samples = classified_samples[a]
-
-#     print('Test samples shape:', test_samples.shape)
-#     print('Classified samples shape:', classified_samples.shape)
-
-#     # Calculate the accuracy of the best model on the test set
-#     accuracy = accuracy_score(test_samples, classified_samples)
-#     print(f"OVERALL ACCURACY: {accuracy:.3f}")
-
-#     #accuracy, confusion, report = print_metrics(test_samples, classified_samples)
-#     accuracy = accuracy_score(test_samples, classified_samples)
-#     confusion = confusion_matrix(test_samples, classified_samples)
-#     report = classification_report(test_samples, classified_samples)
-
-#     fig = px.imshow(confusion, text_auto=True)
-
-#     # Update x and y ticks
-#     fig.update_xaxes(title_text = 'Classified', tickvals = list(range(len(legend.keys()))), ticktext = [legend[key][0] for key in legend])
-#     fig.update_yaxes(title_text = 'Reference', tickvals = list(range(len(legend.keys()))), ticktext = [legend[key][0] for key in legend])
-
-#     # Update heatmap size
-#     fig.update_layout(width = 800, height = 600, title = 'Confusion matrix')
-
-#     fig.show()
-
-#     # Convert the report to a pandas df
-#     report1 = report.strip().split('\n')
-#     report_lists = [line.split() for line in report1]
-#     report_df = pd.DataFrame(report_lists[2:13])
-#     report_df.columns = ['LCZ', 'precision', 'recall', 'f1-score', 'support']
-#     report_df.index = [legend[key][0] for key in legend.keys()]
-#     report_df = report_df.iloc[:, 1:]
-
-#     return accuracy, confusion, report, report_df
-
 
 
