@@ -16,8 +16,7 @@ This project explores the application of LCZs for understanding the UHI in the c
 
 Primary Objectives:
 1. Train a Random Forest classifier on Sentinel-2 Imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes for the city of Toronto
-2. Benchmark performance of the trained model to that of the LCZ Generator (Coming Soon)
-3. Analyze the Urban Heat Island Effect in the Toronto using classified LCZs (Coming Soon)
+2. Analyze the Urban Heat Island Effect in the Toronto using classified LCZs 
 
 
 ### 3. Datasets
@@ -106,11 +105,38 @@ A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urb
 #### Feature Importances
 <img src="reports/figures/s2_fi.png" alt="drawing" width="500"/>
 
-### 4. Next Steps 
+### 4. Urban Heat Island Analysis
 
-- Benchmarking against LCZ Generator
-- Urban Heat Island Analysis
+Thermal differences between urban and rural sites are most pronounced during the night, therefore this study analyzes nightime temperature data in the context of LCZs. [MOD11A1.061 Terra Land Surface Temperature and Emissivity Daily Global Dataset](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD11A1)  provides nightime Land Surface Temperature (LST) at 1km spatial resolution, which is available via the LST_Night_1km band. Toronto's mean nighttime LST data was retrieved for July 2023 using the Google Earth Engine Python API. 
 
+By calculating temperature statistics of each classified LCZ, we can observe distinct thermal behaviours of highly localized urban and rural sites in the City of Toronto. On average, built-up LCZs exhibited higher nightime temperatures than non-built types by at least 1°C. Compact High-rise had the highest mean nighttime LST (21.4°C) amongst all LCZs, while Low Plants had the lowest (18.1°C). When compared to mean nighttime LST across the whole city (20.1°C), Compact High-rise was approximately 1.3°C higher and Low Plants was nearly 2°C lower.
+
+
+
+#### LCZ Nightime Temperature Statistics (July 2023)
+
+|Local Climate Zone|Mean |Min  |Max  |Median|Standard Deviaton|Range|
+|------------------|-----|-----|-----|------|----|-----|
+|Compact High-Rise |21.4 |16.0 |24.0 |21.4  |0.8 |7.9  |
+|Bare rock or paved|21.1 |16.3 |24.0 |21.0  |1.2 |7.6  |
+|Large low-rise    |21.0 |15.3 |24.0 |21.1  |1.3 |8.6  |
+|Open High-Rise    |21.0 |15.3 |24.0 |21.2  |1.5 |8.6  |
+|Open Low-Rise     |21.0 |15.3 |24.0 |21.2  |1.4 |8.6  |
+|Open Mid-Rise     |20.7 |15.3 |24.0 |21.1  |1.7 |8.6  |
+|Scattered trees   |19.7 |15.3 |23.6 |20.0  |2.0 |8.3  |
+|Water             |19.5 |16.2 |22.9 |19.5  |0.4 |6.7  |
+|Sparsely built    |19.5 |15.3 |23.6 |19.7  |2.1 |8.3  |
+|Dense trees       |19.0 |15.3 |23.6 |18.9  |2.1 |8.3  |
+|Bare soil or sand |19.0 |16.2 |24.0 |18.8  |1.7 |7.8  |
+|Low plants        |18.1 |15.3 |24.0 |17.1  |1.9 |8.6  |
+
+
+
+#### Thermal Trends Amongt LCZs
+<img src="reports/figures/temp_barplots.png" alt="drawing" width="800"/>
+
+#### Pairwise Temperature Differences between LCZs
+<img src="reports/figures/temp_pairwise.png" alt="drawing" width="500"/>
 
 
 ### References
