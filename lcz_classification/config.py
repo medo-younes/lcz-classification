@@ -40,16 +40,18 @@ def setup_dir(root_dir, parent, raw, prc):
 
 CRS=4326
 # Set up Geographic Bounds
-CITY = "Toronto" # Select City Name
-COUNTRY = "Canada" # Select Country Name
+CITY = "Cairo" # Select City Name
+COUNTRY = "Egypt" # Select Country Name
 
 
 # Setup Date Range
-TARGET_DATE = '2021-07-15'
-START_DATE = '2021-07-26' # Start date in YYYY-MM-DD
-END_DATE ='2021-09-01' # End date in YYYY-MM-DD
+TARGET_DATE = '2020-06-22'
+START_DATE = '2020-06-01' # Start date in YYYY-MM-DD
+END_DATE ='2020-06-30' # End date in YYYY-MM-DD
 DATE_RANGE=[arrow.get(START_DATE, 'YYYY-MM-DD'), arrow.get(END_DATE, 'YYYY-MM-DD')] 
 
+## SENTINEL-2 MEtaData
+S2_SCALE=0.0001
 S2_TARGET_BANDS=["B02", "B03", "B04", "B05", "B06", "B07", "B8A", "B11", "B12"] #Sentinel-2, bands from B02 to B07, B8A, B11, and B12 (provided at 20 m spatial resolution by Copernicus) are exploited.
 
 ## WORFLOW PARAMETERS
@@ -84,7 +86,8 @@ FIGURES_DIR="../reports/figures/"
 # ===============================================================================================================================================================
 
 # METADATA AND LEGENDS
-STUDY_AREA_FP=f"{STUDY_AREA}/{CITY.lower()}.geojson" # Must have created the study area file from  01_Data_Aquisition.ipynb
+# STUDY_AREA_FP=f"{STUDY_AREA}/{CITY.lower()}.geojson" # Must have created the study area file from  01_Data_Aquisition.ipynb
+STUDY_AREA_FP=f"{STUDY_AREA}/{CITY.lower()}.geojson"
 S2_METADATA_FP=f"{META}/sentinel_bands.csv"
 S2_TILES_FP = f"{META}/sentinel_2_tiles.geojson" # 
 LCZ_LEGEND_FP = f"{META}/lcz_legend.csv" # LCZ Legend - mapping for classes and colors
@@ -104,7 +107,7 @@ BH_VECTOR_FP = f"{BH_PRC}/building_height.parquet"
 BH_RASTER_FP=f"{BH_PRC}/building_height_5m.tif"
 
 # LOCAL CLIMATE ZONE TRAINNG AREAS
-LCZ_FP=f'{LCZ_RAW}/training_areas_v2.geojson'
+LCZ_FP=f'{LCZ_RAW}/data/1f9ff4161db7dfb3d6cf4b8c7f481b2c5e410ef0.kml'
 # LCZ_FP=f"{TRAIN_PRC}/lcz_{CITY.lower()}.geojson"
 
 

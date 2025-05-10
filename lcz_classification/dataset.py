@@ -100,7 +100,7 @@ def ee_download(asset_id, bands, date_range, bbox, output_dir, tile_dims=None, s
 
         search=True
         while search:
-            m=ee.ImageCollection('COPERNICUS/S2_SR').filterBounds(geometry).filterDate(date, date.advance(1,unit='day')).filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
+            m=ee.ImageCollection(asset_id).filterBounds(geometry).filterDate(date, date.advance(1,unit='day')).filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
 
             features=m.getInfo()['features']
             feature_count=len(features)
