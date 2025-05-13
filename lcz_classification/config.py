@@ -73,6 +73,9 @@ DATA, STUDY_AREA, RAW_PATHS, PRC_PATHS = setup_dir(
                                     prc=PRC
                                  )
 
+RAW_DIR = f'../data/{CITY.lower()}/raw'
+PRC_DIR = f'../data/{CITY.lower()}/processed'
+
 # Get all paths from setup_dir()
 S2_RAW, LCZ_RAW, DSM_RAW, CH_RAW, BH_RAW, IS_RAW = RAW_PATHS # Raw Directories
 S2_PRC, S2_MERGED, S2_CLIPPED, S2_RESAMPLED, TRAIN_PRC, CH_PRC, BH_PRC, SF_PRC, IS_PRC, CL_PRC = PRC_PATHS # Processed Directories
@@ -127,4 +130,11 @@ SF_FP=f"{TRAIN_PRC}/svf_{CELL_RESOLUTION}m.tif" # Building Surface Fraction
 UCPS=[BH_FP, CH_FP, IS_FP, BS_FP, SF_FP] # Combined list of all UCP file paths 
 
 # CLASSIFIED IMAGE FILE PATH
-CL_PRC=f"{CL_PRC}_{CELL_RESOLUTION}.tif",
+CLASSIFIED_FP=f'{CL_PRC}/classified_{CELL_RESOLUTION}m.tif'
+CLASSIFIED_CLIPPED_FP=f'{CL_PRC}/classified_{CELL_RESOLUTION}m_clip.tif'
+
+
+# LST DATA
+LST_RAW=f'{RAW_DIR}/lst'
+LST_PRC=f'{PRC_DIR}/lst'
+LST_FP=f'{LST_PRC}/nightime_lst_{CELL_RESOLUTION}.tif'

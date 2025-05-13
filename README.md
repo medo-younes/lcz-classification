@@ -1,42 +1,42 @@
-# Urban Heat Island Analysis with Automated Local Climate Zone Classification: A Toronto Case Study
-Automated classification of Local Climate Zones (LCZs) using Random Forest trained on Sentinel-2 L2A imagery and GIS-derived Urban Canopy Parameters for intra-urban urban heat island analysis in Toronto, Ontario, Canada.
+# Urban Heat Island Analysis with Automated Local Climate Zone Classification: A Cairo Case Study
+Automated classification of Local Climate Zones (LCZs) using Random Forest trained on Sentinel-2 L2A imagery and GIS-derived Urban Canopy Parameters for intra-urban urban heat island analysis in Cairo, Egypt.
 
-<p align="center">
+<!-- <p align="center">
   <img src="reports/figures/lcz_s2_map.png" alt="Classified LCZ Map" width="500"/>
 </p>
-
+ -->
 
 ### 1. Local Climate Zones
 
 The Urban Heat Island (UHI) effect is a phenomenon whereby air temperatures in urban environments are significantly heightened when compared to rural areas. Such an effect is largely due to the thermal properties of urban structures, which tend to absorb heat during the day and release it during the night. Traditional studies typically measured UHI using dichotomous urban / rural classification when comparing temperature trends. Such an approach fails to capture the diverse nature of urban areas, whereby building height, compactness and vegetation cover can vary substantially over space. Developed Stewart and Oke (2012), the Local Climate Zone (LCZ) classification scheme aims to characterise The scheme comprises 17 zones based mainly on properties of surface structure (e.g., building and tree height & density) and surface cover (pervious vs. impervious). Each zone is local in scale, meaning it represents horizontal distances of 100s of metres to several kilometres.  The scheme is a logical starting point for WUDAPT’s aim to gather consistent information across cities globally. To learn more about the Local Climate Zone framework, you can refer to the [WUDAPT Webpage](https://www.wudapt.org/lcz/). A useful resource to better undetstand LCZ can be found in this [illustration by Demuzere et al (2020)](https://www.wudapt.org/wp-content/uploads/2021/03/LCZ_Typology_Demuzere2020.pdf).
 
-### 2. A Toronto Case Study
+<!-- ### 2. A Toronto Case Study
 
 This project explores the application of LCZs for understanding the UHI in the city of Toronto, Ontario. A study in 2021 found that Toronto experienced an annual average daytime UHI intensity of 4.3 C (Duan et al. 2024).
 
 Primary Objectives:
 1. Train a Random Forest classifier on Sentinel-2 Imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes for the city of Toronto
-2. Analyze the Urban Heat Island Effect in the Toronto using classified LCZs 
+2. Analyze the Urban Heat Island Effect in the Toronto using classified LCZs  -->
 
 
 ### 3. Datasets
 
-The table below outlines the various datasets employed for conducting LCZ classification in Toronto. Except for the Canadian buildings dataset, all datasets are available on a global scale and thus can be utilized for any city, as long as the appropriate building heights data is acquired. 
+The table below outlines the various datasets employed for conducting LCZ classification in Cairo. Except for the Canadian buildings dataset, all datasets are available with global coverage.
 
 |Name      |Spatial Resolution| Reference Date|Source | 
 |------------|------------|------------|------------|
 |Sentinel-L2A   | 10 / 20 m  | 2023 | [Google Earth Engine Catalog](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED#description)|
 |ALOS DSM: Global (30m) v3.2  | 30 m  | 2006 | [Google Earth Engine Catalog](https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_AW3D30_V3_2)|
-|Automatically Extracted Buildings  | NA (Vector) | 2023| [Government of Canada](https://open.canada.ca/data/en/dataset/7a5cda52-c7df-427f-9ced-26f19a8a64d6)|
+|Open Buildings 2.5D Temporal Dataser  |  4 m | 2023| [Google Research](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings-temporal_v1)|
 |ETH Global Sentinel-2 (10m) Canopy Height  | 30 m  |2020 | [Google Earth Engine Catalog](https://gee-community-catalog.org/projects/canopy/)|
 |GISA-10m Impervious Surface Area | 10 m  |2016 | [Huang et al (2021)](https://zenodo.org/records/5791855)|
 
 
-#### Local Climate Zone Training Areas
+<!-- #### Local Climate Zone Training Areas
 
-A total of 317 training area polygons representing 12 LCZ classes were employed. The polygons were widely distributed around Toronto, enabling effective training of the Random Forest classifier.
+A total of 317 training area polygons representing 12 LCZ classes were employed. The polygons were widely distributed around Toronto, enabling effective training of the Random Forest classifier. -->
 
-<img src="reports/figures/lcz_training_areas.png" alt="drawing" width="500"/>
+<!-- <img src="reports/figures/lcz_training_areas.png" alt="drawing" width="500"/> -->
 
 #### Sentinel-2 L2A Imagery
 
@@ -58,14 +58,14 @@ Following the steps outlined by Vavassori et al. (2024), Urban Canopy Parameters
 
 |UCP      | Source Dataset| 
 |------------|------------|
-|Building Height  | [Government of Canada](https://open.canada.ca/data/en/dataset/7a5cda52-c7df-427f-9ced-26f19a8a64d6) | 
+|Building Height  | [Google Research](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings-temporal_v1)| 
 |Tree Canopy Height| [ETH Global Sentinel-2 (10m) Canopy Height](https://gee-community-catalog.org/projects/canopy/) | 
 |Sky View Factor  |[ALOS DSM: Global (30m) v3.2 ](https://developers.google.com/earth-engine/datasets/catalog/JAXA_ALOS_AW3D30_V3_2) |
 |Impervious Surface Fraction | [GISA-10m Impervious Surface Area](https://zenodo.org/records/5791855)|
 |Building Surface Fraction| [Government of Canada](https://open.canada.ca/data/en/dataset/7a5cda52-c7df-427f-9ced-26f19a8a64d6)|
 
 
-<img src="reports/figures/UCPs.png" alt="drawing" width="500"/>
+<!-- <img src="reports/figures/UCPs.png" alt="drawing" width="500"/> -->
 
 ### 3. LCZ Classification with Random Forest
 
@@ -75,9 +75,9 @@ A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urb
 
 |Metric      |Result|
 |------------|------|
-|Accuracy    |0.87  |
-|Macro Avg   |0.83  |
-|Weighted Avg |0.87  |
+|Accuracy    |0.92  |
+|Macro Avg   |0.76 |
+|Weighted Avg |0.92  |
 
 ### Classification Report
 

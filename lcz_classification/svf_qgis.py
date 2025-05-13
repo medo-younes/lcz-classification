@@ -8,8 +8,8 @@ print(os.listdir())
 
 
 # SET DIRECTORY PATHS - use absolute path
-dsm_dir=r"D:\GeoAI\projects\LCZ_Classification\data\toronto\processed\svf"
-out_dir=r"D:\GeoAI\projects\LCZ_Classification\data\toronto\processed\svf"
+dsm_dir=r"D:\GeoAI\projects\LCZ_Classification\data\cairo\processed\svf"
+out_dir=r"D:\GeoAI\projects\LCZ_Classification\data\cairo\processed\svf"
 
 dsm_file='alos_dsm_30m.tif' # INPUT DSM FILE NAME
 
