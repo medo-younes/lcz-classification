@@ -76,37 +76,24 @@ def plot_pairwise_jm(df, class1,class2, dist_col, title, figsize, cbar=True,out_
     """
     # Get Unique list of classes
     classes=df[class1].unique()
-    n_classes=len(classes)
+    arrays=[df.set_index(class1)[dist_col].loc[[cl]].values.T for cl in df[class1].unique()]
 
-    # Format data into Array with shape (n_classes, n_classes)
-    n=1
-    matrix=list()
-    mask = list()
+    max_len = max(len(arr) for arr in arrays)
 
-    # 
-    for cl in classes: 
-        jxy = df.set_index(class1).loc[cl]
-        jxy=jxy.set_index(class2)[dist_col].T[classes].values
-        matrix.append(jxy)
-        
-        # Mask for duplicate (redundant) pairs in the display
-        f = [False for i in range(0, n)]
-        t = [True for i in range(0, n_classes - n)]
-        m=f.copy()
-        m.extend(t)
-        mask.append(m)
-        n +=1
+    # Pad at the beginning (before index 0)
+    result = [np.concatenate([np.zeros([max_len - len(arr) + 1]),  arr])  for arr in arrays]
 
-    mask=np.array(mask)
-    matrix=np.array(matrix)
+    matrix = np.vstack(result).T
+
 
     if out_file:
         plt.savefig(out_file)
 
-
+    
     # Make pairwise distance plot
     plt.figure(figsize=figsize)
-    plot_mask = (mask == True) | (matrix == 0.0)
+    plot_mask =  matrix == 0.0
+
     sns.heatmap(matrix, 
                 annot=True, 
                 fmt=".1f", 

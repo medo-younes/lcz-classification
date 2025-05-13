@@ -15,11 +15,31 @@ import math
 from prettytable import PrettyTable
 from pyproj.crs import CRS as pycrs
 import fiona 
-
+from shapely.geometry import shape
+from rasterio.features import shapes
 import math
-
+from itertools import combinations
 
 fiona.supported_drivers['KML'] = 'r'  # Explicitly enable KML read support
+
+def smoothen_gdf(gdf,buffer):
+    return gdf.set_geometry(gdf.buffer(buffer).buffer(-buffer))
+
+
+
+
+def masked_study_area(arr, crs,transform, nodata):
+
+    height, width=arr.shape
+    mask=arr != nodata
+
+    empty_arr=np.zeros((height,width))
+    geometries=[dict(geometry=shape(geom)) for geom, val in shapes(empty_arr,mask=mask,transform=transform)]
+
+    study_area=gpd.GeoDataFrame.from_records(geometries).set_geometry('geometry')
+    study_area = gpd.GeoDataFrame(geometry=[study_area.union_all()], crs=crs).explode().reset_index(drop=True)
+    return study_area.loc[[study_area.area.sort_values(ascending=False).index[0]]].reset_index(drop=True)
+
 
 def kml_to_gdf(kml_path):
     """Read KML file a GeoPandas GeoDataFrame
@@ -457,54 +477,69 @@ def generate_raster(bbox,crs, resolution):
         ), 
     ).rio.write_crs(crs,inplace=True)
 
-def jeffries_matuista_distance(class1, class2):
-    """
-    Compute Jeffries-Matusita (JM) distance using NumPy.
-    
-    Parameters:
-    - class1: np.ndarray of shape (n_samples, n_bands)
-    - class2: np.ndarray of shape (n_samples, n_bands)
-    
-    Returns:
-    - JM distance (float)
-    """
-    # Mean vectors
-    m1 = np.mean(class1, axis=0)
-    m2 = np.mean(class2, axis=0)
-    
-    # Covariance matrices
-    s1 = np.cov(class1, rowvar=False)
-    s2 = np.cov(class2, rowvar=False)
-    
-    # Average covariance matrix
-    s12 = 0.5 * (s1 + s2)
-    
-    # Add small identity matrix for numerical stability
-    epsilon = 1e-6
-    s12 += np.eye(s12.shape[0]) * epsilon
-    s1 += np.eye(s1.shape[0]) * epsilon
-    s2 += np.eye(s2.shape[0]) * epsilon
 
-    # Difference of means
-    diff = (m1 - m2).reshape(-1, 1)
+def jeffries_matusita_distance(class1, class2):
+    """
+    Compute Jeffries-Matusita distance between two classes in a multispectral image.
+
+    Parameters:
+    - class1: 2D NumPy array representing the spectral signatures of class 1.
+    - class2: 2D NumPy array representing the spectral signatures of class 2.
+
+    Returns:
+    - JM distance between the two classes.
+    """
     
-    # First term of Bhattacharyya distance
-    B1 = 0.125 * (diff.T @ np.linalg.inv(s12) @ diff).item()
+    # compute covariance matrix
+    cov_class1 = np.cov(class1, rowvar=False)
+    cov_class2 = np.cov(class2, rowvar=False)
     
-    # Second term
-    det_s1 = np.linalg.det(s1)
-    det_s2 = np.linalg.det(s2)
-    det_s12 = np.linalg.det(s12)
+    # compute mean difference
+    mean_diff = np.mean(class1, axis=0) - np.mean(class2, axis=0)
+
+    inv_cov_sum = np.linalg.inv((cov_class1 + cov_class2)/2)
+  
+    tmp = np.dot(mean_diff.T, inv_cov_sum)
+    tmp = np.dot(tmp, mean_diff)
+    MH = tmp
     
-    B2 = 0.5 * np.log(det_s12 / np.sqrt(det_s1 * det_s2))
-    
-    # Bhattacharyya distance
-    B = B1 + B2
-    
-    # Jeffries-Matusita distance
-    JM = 2 * (1 - np.exp(-B))
-    
-    return JM
+    tmp = np.linalg.det((cov_class1 + cov_class2)/2) / np.sqrt( np.linalg.det(cov_class1)*np.linalg.det(cov_class2) )
+    tmp = np.log(tmp)
+    B = MH/8.0 + tmp/2.0
+    jm_distance = 2 * (1 - np.exp(-B))
+
+    return jm_distance, mean_diff, cov_class1, cov_class2
+
+
+
+def s2_spectral_seperability(pixels, class_gdf, class_col, label_dict):
+
+    results=list()
+    classes=class_gdf[class_col].unique()
+
+        
+    for class1, class2 in combinations(classes, 2):
+        class1_data = pixels[class1]
+        class2_data = pixels[class2]
+
+        class1_data = class1_data.astype('float64')
+        class2_data = class2_data.astype('float64')
+        
+        # check if there is any nan inside the data
+        has_nans_class1_data = np.isnan(class1_data).any()
+        has_nans_class2_data = np.isnan(class2_data).any()
+
+        if has_nans_class1_data or has_nans_class2_data:
+            print(f"The {class1} and {class2} classes contain NaN values using Skipping calculation.")
+            continue
+
+        jm_distance, mean_diff, cov_class1, cov_class2 = jeffries_matusita_distance(class1_data, class2_data)
+        results.append({'class1': label_dict[class1], 'class2': label_dict[class2], 'jm_distance': jm_distance})
+
+    return pd.DataFrame(results)
+
+
+
 
 
 def band_stats(zones,raster,stats=['min', 'max', 'mean', 'median', 'majority']):

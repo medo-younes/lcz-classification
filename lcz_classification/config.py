@@ -45,11 +45,13 @@ COUNTRY = "Canada" # Select Country Name
 
 
 # Setup Date Range
-TARGET_DATE = '2021-07-15'
-START_DATE = '2021-07-26' # Start date in YYYY-MM-DD
-END_DATE ='2021-09-01' # End date in YYYY-MM-DD
+TARGET_DATE = '2020-06-22'
+START_DATE = '2020-06-01' # Start date in YYYY-MM-DD
+END_DATE ='2020-06-30' # End date in YYYY-MM-DD
 DATE_RANGE=[arrow.get(START_DATE, 'YYYY-MM-DD'), arrow.get(END_DATE, 'YYYY-MM-DD')] 
 
+## SENTINEL-2 MEtaData
+S2_SCALE=0.0001
 S2_TARGET_BANDS=["B02", "B03", "B04", "B05", "B06", "B07", "B8A", "B11", "B12"] #Sentinel-2, bands from B02 to B07, B8A, B11, and B12 (provided at 20 m spatial resolution by Copernicus) are exploited.
 
 ## WORFLOW PARAMETERS
@@ -71,6 +73,9 @@ DATA, STUDY_AREA, RAW_PATHS, PRC_PATHS = setup_dir(
                                     prc=PRC
                                  )
 
+RAW_DIR = f'../data/{CITY.lower()}/raw'
+PRC_DIR = f'../data/{CITY.lower()}/processed'
+
 # Get all paths from setup_dir()
 S2_RAW, LCZ_RAW, DSM_RAW, CH_RAW, BH_RAW, IS_RAW = RAW_PATHS # Raw Directories
 S2_PRC, S2_MERGED, S2_CLIPPED, S2_RESAMPLED, TRAIN_PRC, CH_PRC, BH_PRC, SF_PRC, IS_PRC, CL_PRC = PRC_PATHS # Processed Directories
@@ -84,7 +89,8 @@ FIGURES_DIR="../reports/figures/"
 # ===============================================================================================================================================================
 
 # METADATA AND LEGENDS
-STUDY_AREA_FP=f"{STUDY_AREA}/{CITY.lower()}.geojson" # Must have created the study area file from  01_Data_Aquisition.ipynb
+# STUDY_AREA_FP=f"{STUDY_AREA}/{CITY.lower()}.geojson" # Must have created the study area file from  01_Data_Aquisition.ipynb
+STUDY_AREA_FP=f"{STUDY_AREA}/{CITY.lower()}.geojson"
 S2_METADATA_FP=f"{META}/sentinel_bands.csv"
 S2_TILES_FP = f"{META}/sentinel_2_tiles.geojson" # 
 LCZ_LEGEND_FP = f"{META}/lcz_legend.csv" # LCZ Legend - mapping for classes and colors
@@ -104,7 +110,7 @@ BH_VECTOR_FP = f"{BH_PRC}/building_height.parquet"
 BH_RASTER_FP=f"{BH_PRC}/building_height_5m.tif"
 
 # LOCAL CLIMATE ZONE TRAINNG AREAS
-LCZ_FP=f'{LCZ_RAW}/training_areas_v2.geojson'
+LCZ_FP=f'{LCZ_RAW}/training_areas_v2.kml'
 # LCZ_FP=f"{TRAIN_PRC}/lcz_{CITY.lower()}.geojson"
 
 
@@ -124,4 +130,11 @@ SF_FP=f"{TRAIN_PRC}/svf_{CELL_RESOLUTION}m.tif" # Building Surface Fraction
 UCPS=[BH_FP, CH_FP, IS_FP, BS_FP, SF_FP] # Combined list of all UCP file paths 
 
 # CLASSIFIED IMAGE FILE PATH
-CL_PRC=f"{CL_PRC}_{CELL_RESOLUTION}.tif",
+CLASSIFIED_FP=f'{CL_PRC}/classified_{CELL_RESOLUTION}m.tif'
+CLASSIFIED_CLIPPED_FP=f'{CL_PRC}/classified_{CELL_RESOLUTION}m_clip.tif'
+
+
+# LST DATA
+LST_RAW=f'{RAW_DIR}/lst'
+LST_PRC=f'{PRC_DIR}/lst'
+LST_FP=f'{LST_PRC}/nightime_lst_{CELL_RESOLUTION}_202307.tif'

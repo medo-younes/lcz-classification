@@ -49,143 +49,46 @@ def fetch_metadata(name):
         
 
 
-def ee_download(asset_id, bands, date_range, bbox, output_dir, tile_dims=None, scale=30):
-    """Download ALOS DSM data for a specified bounding box using Google Earth Engine.
+import geemap
 
-    Args: 
-        asset_id (str): Asset ID of dataset on Google Earth Engine Catalog
-        bands (list): Desired bands to select and download from the requested dataset
-        date_range (list): start and end date to filter the ee.ImageCollection
-        bbox (list): Bounding box coordinates in format [west, south, east, north]
-        output_dir (str): Output directory to save downloaded GeoTIFFs
-        tile_dims (tuple): Dimensions of tiling for subdividing the bbox into smaller regions, useful for downloading from large areas
-        scale (int): Desired spatial resolution in meters
-        
-    Returns:
-        str: Path to the downloaded GeoTIFF file
-    """
-    # Initialize Earth Engine
-    try:
+def ee_get_image(col_id, band,bbox):
+    
+    geom=ee.Geometry.Rectangle(bbox)
+
+    asset_type=ee.data.getInfo(col_id)['type']
+
+    if asset_type == 'IMAGE_COLLECTION':
+        image=ee.ImageCollection(col_id).filterBounds(geom).select(band).mean().clip(geom)
+    else:
+        image=ee.Image(col_id).select(band).clip(geom)
+
+    image_id = col_id.replace('/','_') + f'_{band}'
    
-        ee.Initialize()
-    except Exception as e:
-        ee.Authenticate()
-        ee.Initialize()
-        print("Error initializing Earth Engine. Make sure you're authenticated.")
-        print(f"Error details: {e}")
-        print("Run 'earthengine authenticate' in terminal if you haven't authenticated.")
-        return None
-    
+    return image, image_id
 
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-    
-    images= list()
-    
-    start_date, end_date=date_range
-    band_list =list()
-    # try:
-    # Create a bounding box geometry from coordinates
-    geometry = ee.Geometry.Rectangle(bbox)
-    
-    data_type=ee.data.getInfo(asset_id)['type'] # Retrieve data type based on asset_id
-    print(data_type)
 
-    if data_type == "IMAGE_COLLECTION":
+def ee_download_tiled_image(image, image_id,tiles_gdf, scale, output_dir,):
 
-        # # Load the ImageCollection
-        # image_collection = ee.ImageCollection(asset_id).filterBounds(geometry).filterDate(start_date,end_date).filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 5))  # Filter for less than 20% cloud cover
-        
-        date=ee.Date(start_date)
+    for idx, tile in tiles_gdf.iterrows():
+        tile_id=tile.tile_id
+        bbox=tile.geometry.bounds
+        bbox_geom=ee.Geometry.Rectangle(bbox)
+        filename=f"{output_dir}/{image_id}_{tile_id}_{scale}m.tif"
+        print(filename)
+        if os.path.exists(filename) == False:
 
-        search=True
-        while search:
-            m=ee.ImageCollection('COPERNICUS/S2_SR').filterBounds(geometry).filterDate(date, date.advance(1,unit='day')).filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20))
-
-            features=m.getInfo()['features']
-            feature_count=len(features)
-            print(f'{feature_count} Features found')
-            if feature_count > 0:
-                search=False
-                print(f'Found Collection on Date {date.getInfo()}')
-                        # Iterate over features within the image collection
-                for feature in features:
-                    
-                    image_id=feature['id']
-                    image=ee.Image(image_id)
-                    # Iterate over bands
-                    for band in bands:
-                        
-                        band_image=image.select(band)
-                        images.append(band_image)
-                
-                        band_list.append(band)
-            else:
-                print('Advancing date 1 day')
-                date=date.advance(1,unit='day')
-
-    
-
-    elif data_type == "IMAGE":
-            image=ee.Image(asset_id).select(band)
-            # Iterate over bands
-            for band in bands:
-                 # Iterate over bands
-                band_image=image.select(band)
-                image_id = image.getInfo()['id']
-                images.append(band_image)
-                band_list.append(band)
-            
-    for im,b in zip(images,band_list):
-    
-        im_id=im.getInfo()['id'].split("/")[-1].split("_")[-1]
-        im_dir=f"{output_dir}/{im_id}"
-        if os.path.exists(im_dir) == False:
-            os.mkdir(im_dir)
-        
-        if tile_dims is not None:
-            
-
-            tile_bbox=im.geometry().bounds().intersection(ee.Geometry.Rectangle(bbox) ,maxError=1)
-            tile_bbox_coords=tile_bbox.bounds().getInfo()['coordinates']
-            xx, yy  = np.array(tile_bbox_coords).T
-            in_bbox=[min(xx), min(yy), max(xx), max(yy)]
-            # return tile_bbox_coords
-            tiles=tiles_from_bbox(bbox=in_bbox,tile_dims=tile_dims)
-            for idx, tile in tiles.iterrows():
-                tile_path=f"{im_dir}/{im_id}_{b}_{tile.tile_id}.tif"
-                if os.path.exists(tile_path) == False:
-                  
-                    print(f'Downloading {im_id} tile {tile.tile_id}')
-                    clipped=im.clip(ee.Geometry.Rectangle(list(tile.geometry.bounds)))
-                    geemap.ee_export_image(
-                        clipped,
-                        filename=tile_path,
-                        scale=scale,
-                        file_per_band=False,
-                        crs='EPSG:4326', 
-                        region = list(tile.geometry.bounds)
-                )
-        else:
-
-            print(f'Downloading {im_id}')
-            clipped=im.clip(ee.Geometry.Rectangle(bbox))
-            im_dir=f"{output_dir}/{im_id}"
-            os.mkdir(im_dir)
             geemap.ee_export_image(
-                clipped,
-                filename=f"{im_dir}/{im_id}_{b}.tif",
+                image,
+                filename=filename,
                 scale=scale,
                 file_per_band=False,
                 crs='EPSG:4326', 
-                region = bbox
+                region = bbox_geom
             )
-
     
-
-    print("EE DOWNLOAD COMPLETE")
-
-
+            print(f"Downloaded Image: {image_id}_{tile_id}_{scale}m.tif")
+        else:
+            print(f"{filename} Already Exists")
 
 def get_city_polygon(city:str,country:str) -> gpd.GeoDataFrame:
     """

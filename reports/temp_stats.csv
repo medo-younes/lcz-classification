@@ -1,6 +1,6 @@
 name,mean,min,max,median,std,range
 Compact High-Rise,21.4,16.0,24.0,21.4,0.8,7.9
-Bare rock or paved,21.1,16.3,24.0,21.0,1.2,7.6
+Bare rock or paved,21.1,16.3,24.0,21.1,1.3,7.6
 Large low-rise,21.0,15.3,24.0,21.1,1.3,8.6
 Open High-Rise,21.0,15.3,24.0,21.2,1.5,8.6
 Open Low-Rise,21.0,15.3,24.0,21.2,1.4,8.6
@@ -8,6 +8,6 @@ Open Mid-Rise,20.7,15.3,24.0,21.1,1.7,8.6
 Scattered trees,19.7,15.3,23.6,20.0,2.0,8.3
 Water,19.5,16.2,22.9,19.5,0.4,6.7
 Sparsely built,19.5,15.3,23.6,19.7,2.1,8.3
-Dense trees,19.0,15.3,23.6,18.9,2.1,8.3
-Bare soil or sand,19.0,16.2,24.0,18.8,1.7,7.8
+Dense trees,19.0,15.3,23.6,19.0,2.1,8.3
+Bare soil or sand,19.0,16.2,24.0,18.7,1.7,7.8
 Low plants,18.1,15.3,24.0,17.1,1.9,8.6
