@@ -40,7 +40,7 @@ A total of 317 training area polygons representing 12 LCZ classes were employed.
 
 #### Sentinel-2 L2A Imagery
 
-As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were utilized from the harmonized Sentinel-2 L2A dataset. Below is an RGB composite of the Sentinel-2 imagery collected on 15th of May, 2023.
+As per Vavassori et al. (2024), bands from B02 to B07, B8A, B11, and B12 were utilized from the harmonized Sentinel-2 L2A dataset. The plots below represent spectral signatures along with measures of spectral seperability amongst the labelled Local Climate Zones.
 
 #### Spectral Signature of LCZ Classes 
 
@@ -69,7 +69,7 @@ Following the steps outlined by Vavassori et al. (2024), Urban Canopy Parameters
 
 ### 3. LCZ Classification with Random Forest
 
-A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes, data processing, data exploration and model assessment follows the methodology from Vavasorri et al. (2024). The trained model attained an overall testing accuracy of 90%, the classification report, confusion matrix and feature importances are given below.
+A Random Forest Classifier was trained on Sentinel-2 imagery and GIS-derived Urban Canopy Parameters to predict LCZ classes, data processing, data exploration and model assessment follows the methodology from Vavasorri et al. (2024). The trained model attained an overall testing accuracy of 87%, the classification report, confusion matrix and feature importances are given below.
 
 ### Accuracy Metrics
 
